@@ -1,0 +1,13 @@
+
+
+dependencies {
+    compile('com.fasterxml.jackson.module:jackson-module-kotlin:2.8.10')
+    compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.10')
+    compile('org.springframework.boot:spring-boot-configuration-processor')
+    compile('org.springframework.boot:spring-boot-starter-batch')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-data-cassandra')
+}
+
+compileKotlin.dependsOn(processResources)
+
