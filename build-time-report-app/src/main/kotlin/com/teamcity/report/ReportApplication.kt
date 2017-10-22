@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+import org.springframework.scheduling.annotation.EnableScheduling
 
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
  *         Date:  19.10.2017
  */
 @SpringBootApplication
+@EnableScheduling
 @EnableAutoConfiguration(exclude = arrayOf(
         DataSourceAutoConfiguration::class,
         DataSourceTransactionManagerAutoConfiguration::class,

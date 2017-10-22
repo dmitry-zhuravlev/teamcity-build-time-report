@@ -11,5 +11,6 @@ import org.springframework.data.cassandra.mapping.Table
 data class BuildEntity(@Id val id: Long,
         /*@PrimaryKeyColumn*/ val buildTypeId: String,
         /*@PrimaryKeyColumn*/ val projectId: String,
-        /*@PrimaryKeyColumn*/ val buildDuration: Double,
+        /*@PrimaryKeyColumn*/ val finishDate: Long,
+        /*@PrimaryKeyColumn*/ val buildDuration: Long,
                        var serverName: String? = null)

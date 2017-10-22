@@ -1,7 +1,6 @@
 package com.teamcity.report.client.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.teamcity.report.repository.entity.BuildEntity
 import java.time.ZonedDateTime
 
 /**
@@ -21,4 +20,3 @@ data class Statistics(val property: List<Property>)
 
 data class Property(val name: String, val value: String)
 
-fun Build.toEntity() = BuildEntity(id, buildType.projectId, buildType.id, statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toDouble() ?: 0.0) //TODO perform additional checks

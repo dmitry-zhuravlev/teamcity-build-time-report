@@ -5,8 +5,9 @@ CREATE TABLE IF NOT EXISTS report.teamcity_build(
       buildTypeId text,
       projectId text,
       serverName text,
-      buildDuration double,
-      PRIMARY KEY (id, buildTypeId, projectId, serverName)
+      buildDuration bigint,
+      finishDate timestamp,
+      PRIMARY KEY (buildTypeId, finishDate, id, projectId, serverName)
  );
 
  CREATE TABLE IF NOT EXISTS report.teamcity_project(

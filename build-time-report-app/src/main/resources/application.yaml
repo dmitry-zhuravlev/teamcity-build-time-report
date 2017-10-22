@@ -4,10 +4,6 @@ spring:
       keyspace-name: report
       contact-points: localhost
 
-worker:
-     - chunkSize: 100
-       requestTimeoutMs: 30000
-
 teamcity:
      servers:
             - name: Local Team City
@@ -15,3 +11,8 @@ teamcity:
               url: http://localhost:8111
               username: admin
               password: 123456 # TODO encrypt
+              worker:
+                    actualizationDays: 1
+                    chunkSize: 100
+                    requestTimeoutMs: 2000
+                    startPage: 0
