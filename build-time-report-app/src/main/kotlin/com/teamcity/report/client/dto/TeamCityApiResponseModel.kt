@@ -1,6 +1,7 @@
 package com.teamcity.report.client.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.teamcity.report.config.ConfigDefault.DATE_PATTERN
 import java.time.ZonedDateTime
 
 /**
@@ -11,7 +12,7 @@ data class Builds(val count: Long, val nextHref: String?, val build: List<Build>
 
 data class Build(var serverName: String? = null,
                  val id: Long, val buildType: BuildType,
-                 @JsonFormat(pattern = "yyyyMMdd'T'HHmmssZ") val finishDate: ZonedDateTime,
+                 @JsonFormat(pattern = DATE_PATTERN) val finishDate: ZonedDateTime,
                  val statistics: Statistics)
 
 data class BuildType(val id: String, val name: String, val projectId: String)

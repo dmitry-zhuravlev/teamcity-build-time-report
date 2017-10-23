@@ -2,6 +2,7 @@ package com.teamcity.report.config
 
 import com.teamcity.report.batch.IndexerJobsCoordinatorService
 import com.teamcity.report.batch.processor.ServerNameEnhancerBuildsProcessor
+import com.teamcity.report.batch.reader.BuildsActualizationIndexerReader
 import com.teamcity.report.batch.reader.BuildsIndexerReader
 import com.teamcity.report.batch.writer.BuildsIndexerWriter
 import com.teamcity.report.client.TeamCityApiClient
@@ -17,7 +18,6 @@ import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.core.launch.support.SimpleJobLauncher
 import org.springframework.batch.core.repository.JobRepository
-import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -99,18 +99,22 @@ class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
             serversConfig.servers.map { serverConfig ->
                 jobBuilderFactory.get("buildsIndexerActualizationJob${serverConfig.name.replace(" ", "")}") //TODO possible to use id instead serverName
                         .incrementer(RunIdIncrementer())
-                        .start(actualizationIndexerStep())
+                        .start(actualizationIndexerStep(serverConfig))
                         .listener(indexerJobsCoordinatorService)
                         .build()
             }
 
-    private fun actualizationIndexerStep() =
+    private fun actualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
             stepBuilderFactory.get("actualizationIndexerStep")
-                    .tasklet { contribution, chunkContext ->
-                        println("actualizationIndexer tasklet executed!") //TODO implement
-                        Thread.sleep(4000)
-                        RepeatStatus.FINISHED
-                    }
+                    /* .tasklet { contribution, chunkContext ->
+                         println("actualizationIndexer tasklet executed!") //TODO implement
+                         Thread.sleep(4000)
+                         RepeatStatus.FINISHED
+                     }*/
+                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize)
+                    .reader(BuildsActualizationIndexerReader(client, serverConfig))
+                    .processor(ServerNameEnhancerBuildsProcessor(serverConfig.name))
+                    .writer(BuildsIndexerWriter(repository, serverConfig.worker.requestTimeoutMs))
                     .allowStartIfComplete(true)
                     .build()
 

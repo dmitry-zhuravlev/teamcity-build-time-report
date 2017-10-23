@@ -21,6 +21,6 @@ data class TeamCityConfig(var servers: List<ServerConfig> = mutableListOf()) {
         data class WorkerConfig(var requestTimeoutMs: Long = WORKER_REQUEST_TIMEOUT_MS,
                                 var chunkSize: Int = WORKER_CHUNK_SIZE,
                                 var startPage: Int = WORKER_START_PAGE,
-                                var actualizationDays: Int = WORKER_ACTUALIZATION_DAYS)
+                                var actualizationDays: Long = WORKER_ACTUALIZATION_DAYS)
     }
 }

@@ -5,10 +5,12 @@ package com.teamcity.report.config
  *         Date:  19.10.2017
  */
 object ConfigDefault {
-    val WORKER_REQUEST_TIMEOUT_MS = 30000L
-    val WORKER_CHUNK_SIZE = 100
-    val WORKER_START_PAGE = 0
-    val WORKER_ACTUALIZATION_DAYS = 1
+    const val WORKER_REQUEST_TIMEOUT_MS = 30000L
+    const val WORKER_CHUNK_SIZE = 100
+    const val WORKER_START_PAGE = 0
+    const val WORKER_ACTUALIZATION_DAYS = 1L
+
+    const val DATE_PATTERN = "yyyyMMdd'T'HHmmssZ"
 }
 
 object DefaultPath {
