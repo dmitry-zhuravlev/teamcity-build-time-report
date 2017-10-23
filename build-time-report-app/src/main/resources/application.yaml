@@ -1,4 +1,7 @@
 spring:
+  batch:
+    job:
+      enabled: false
   data:
     cassandra:
       keyspace-name: report
@@ -6,7 +9,8 @@ spring:
 
 teamcity:
      servers:
-            - name: Local Team City
+            - id: LocalTC
+              name: Local TeamCity
               apiVersion: latest
               url: http://localhost:8111
               username: admin

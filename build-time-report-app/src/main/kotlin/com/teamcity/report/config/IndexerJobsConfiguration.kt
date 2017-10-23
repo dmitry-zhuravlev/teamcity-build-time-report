@@ -7,7 +7,7 @@ import com.teamcity.report.batch.reader.BuildsIndexerReader
 import com.teamcity.report.batch.writer.BuildsIndexerWriter
 import com.teamcity.report.client.TeamCityApiClient
 import com.teamcity.report.client.dto.Build
-import com.teamcity.report.repository.BuildRepository
+import com.teamcity.report.converters.toJobParameters
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.configuration.JobRegistry
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
@@ -21,7 +21,6 @@ import org.springframework.batch.core.repository.JobRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.task.TaskExecutor
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
@@ -34,7 +33,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 @Configuration
 @EnableBatchProcessing
 @EnableAsync
-class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
+class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     @Autowired
     lateinit var jobBuilderFactory: JobBuilderFactory
 
@@ -45,22 +44,26 @@ class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
     lateinit var serversConfig: TeamCityConfig
 
     @Autowired
-    lateinit var repository: BuildRepository
-
-    @Autowired
     lateinit var client: TeamCityApiClient
 
     @Autowired
     lateinit var indexerJobsCoordinatorService: IndexerJobsCoordinatorService
 
+    @Autowired
+    lateinit var buildsActualizationReader: BuildsActualizationIndexerReader
+
+    @Autowired
+    lateinit var buildsIndexerReader: BuildsIndexerReader
+
+    @Autowired
+    lateinit var buildsIndexerWriter: BuildsIndexerWriter
+
 
     @Bean
-    fun taskExecutor(): TaskExecutor {
-        val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 5    //TODO choose in respect of number of servers
-        executor.maxPoolSize = 10
-        executor.setQueueCapacity(25)
-        return executor
+    fun taskExecutor() = ThreadPoolTaskExecutor().apply {
+        corePoolSize = 5    //TODO choose in respect of number of servers
+        maxPoolSize = 10
+        setQueueCapacity(25)
     }
 
 
@@ -71,16 +74,15 @@ class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
     }
 
     @Bean
-    fun jobRegistryBeanPostProcessor(jobRegistry: JobRegistry, jobLauncher: JobLauncher, allJobs:List<Job>): JobRegistryBeanPostProcessor {
-        val jobRegistryBeanPostProcessor = JobRegistryBeanPostProcessor()
-        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry)
+    fun jobRegistryBeanPostProcessor(jobRegistry: JobRegistry, jobLauncher: JobLauncher, allJobs: List<Job>) = JobRegistryBeanPostProcessor().apply {
+        setJobRegistry(jobRegistry)
         allJobs.forEach { job ->
-            jobRegistryBeanPostProcessor.postProcessAfterInitialization(job, job.name)
+            postProcessAfterInitialization(job, job.name)
+            serversConfig.toJobParameters().forEach { jobParameters ->
+                jobLauncher.run(job, jobParameters)
+            }
         }
-
-        return jobRegistryBeanPostProcessor
     }
-
 
     @Bean
     fun allJobs() = buildsIndexerJobs() + indexerActualizationJobs()
@@ -89,7 +91,7 @@ class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
     private fun buildsIndexerJobs() =
             serversConfig.servers.map { serverConfig ->
                 val buildIndexerStep = buildsIndexerStep(serverConfig)
-                jobBuilderFactory.get("buildsIndexerJob${serverConfig.name.replace(" ", "")}") //TODO possible to use id instead serverName
+                jobBuilderFactory.get("buildsIndexerJob${serverConfig.id}")
                         .incrementer(RunIdIncrementer())
                         .start(buildIndexerStep)
                         .build()
@@ -97,7 +99,7 @@ class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun indexerActualizationJobs() =
             serversConfig.servers.map { serverConfig ->
-                jobBuilderFactory.get("buildsIndexerActualizationJob${serverConfig.name.replace(" ", "")}") //TODO possible to use id instead serverName
+                jobBuilderFactory.get("buildsIndexerActualizationJob${serverConfig.id}")
                         .incrementer(RunIdIncrementer())
                         .start(actualizationIndexerStep(serverConfig))
                         .listener(indexerJobsCoordinatorService)
@@ -106,25 +108,20 @@ class WorkerConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun actualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
             stepBuilderFactory.get("actualizationIndexerStep")
-                    /* .tasklet { contribution, chunkContext ->
-                         println("actualizationIndexer tasklet executed!") //TODO implement
-                         Thread.sleep(4000)
-                         RepeatStatus.FINISHED
-                     }*/
-                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize)
-                    .reader(BuildsActualizationIndexerReader(client, serverConfig))
+                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize.toInt())
+                    .reader(buildsActualizationReader)
                     .processor(ServerNameEnhancerBuildsProcessor(serverConfig.name))
-                    .writer(BuildsIndexerWriter(repository, serverConfig.worker.requestTimeoutMs))
+                    .writer(buildsIndexerWriter)
                     .allowStartIfComplete(true)
                     .build()
 
 
     private fun buildsIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
             stepBuilderFactory.get("buildsIndexerStep")
-                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize)
-                    .reader(BuildsIndexerReader(client, serverConfig))
+                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize.toInt())
+                    .reader(buildsIndexerReader)
                     .processor(ServerNameEnhancerBuildsProcessor(serverConfig.name))
-                    .writer(BuildsIndexerWriter(repository, serverConfig.worker.requestTimeoutMs))
+                    .writer(buildsIndexerWriter)
                     .allowStartIfComplete(true)
                     .build()
 

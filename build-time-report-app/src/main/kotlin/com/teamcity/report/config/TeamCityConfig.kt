@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component
 @Component
 @ConfigurationProperties("teamcity")
 data class TeamCityConfig(var servers: List<ServerConfig> = mutableListOf()) {
-    data class ServerConfig(var name: String = "", var apiVersion: String = "", var url: String = "",
+    data class ServerConfig(var id: String = "", var name: String = "", var apiVersion: String = "", var url: String = "",
                             var username: String = "", var password: String = "", var worker: WorkerConfig = WorkerConfig()) {
         @Component
         @ConfigurationProperties("worker")
         data class WorkerConfig(var requestTimeoutMs: Long = WORKER_REQUEST_TIMEOUT_MS,
-                                var chunkSize: Int = WORKER_CHUNK_SIZE,
-                                var startPage: Int = WORKER_START_PAGE,
+                                var chunkSize: Long = WORKER_CHUNK_SIZE,
+                                var startPage: Long = WORKER_START_PAGE,
                                 var actualizationDays: Long = WORKER_ACTUALIZATION_DAYS)
     }
 }
