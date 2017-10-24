@@ -5,8 +5,6 @@ import com.teamcity.report.repository.entity.BuildEntity
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemWriter
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.retry.backoff.ThreadWaitSleeper
 import org.springframework.stereotype.Component
 
 /**
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Component
 @Component
 @StepScope
 class BuildsIndexerWriter(
-        @Value("#{jobParameters['requestTimeoutMs']}")
-        private val requestTimeoutMs: Long,
         @Autowired
         private val repository: BuildRepository
 ) : ItemWriter<List<BuildEntity>?> {
@@ -27,6 +23,5 @@ class BuildsIndexerWriter(
                 repository.save(build)
             }
         }
-        ThreadWaitSleeper().sleep(requestTimeoutMs)
     }
 }

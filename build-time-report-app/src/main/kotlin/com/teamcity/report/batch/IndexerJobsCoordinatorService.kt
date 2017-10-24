@@ -47,6 +47,7 @@ class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
 //                    jobOperator.start(jobName, "")
 //                else
 //                jobOperator.restart(executionId)
+                terminatedIndexerJobsExecutions.remove(jobName)
                 jobOperator.startNextInstance(jobName)
             }
         }

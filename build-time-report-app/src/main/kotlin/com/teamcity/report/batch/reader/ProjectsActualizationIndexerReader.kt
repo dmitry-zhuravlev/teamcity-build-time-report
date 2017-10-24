@@ -2,12 +2,14 @@ package com.teamcity.report.batch.reader
 
 import com.teamcity.report.client.TeamCityApiClient
 import com.teamcity.report.client.dto.Project
+import com.teamcity.report.client.dto.Projects
 import com.teamcity.report.config.TeamCityConfig
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemReader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.retry.backoff.ThreadWaitSleeper
 import org.springframework.stereotype.Component
 
 /**
@@ -17,6 +19,9 @@ import org.springframework.stereotype.Component
 @Component
 @StepScope
 class ProjectsActualizationIndexerReader(
+        @Value("#{jobParameters['requestTimeoutMs']}")
+        private val requestTimeoutMs: Long,
+
         @Value("#{jobParameters['start']}")
         private var start: Long,
 
@@ -53,8 +58,15 @@ class ProjectsActualizationIndexerReader(
         val projectsList = projects.project
         logger.info("Got the following projects from server '$serverName' $projectsList")
         start += chunkSize
-        return if (isLastChunk(projectsList)) null else projectsList
+        pauseAfterRead(requestTimeoutMs)
+        return if (isLastChunk(projects) && projectsList.isEmpty()) {
+            null
+        } else {
+            projectsList
+        }
     }
 
-    private fun isLastChunk(builds: List<Project>) = builds.isEmpty()
+    private fun pauseAfterRead(requestTimeoutMs: Long) = ThreadWaitSleeper().sleep(requestTimeoutMs)
+
+    private fun isLastChunk(projects: Projects) = projects.nextHref == null
 }

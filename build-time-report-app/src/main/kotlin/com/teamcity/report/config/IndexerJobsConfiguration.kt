@@ -106,9 +106,11 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     fun allJobs() = buildsIndexerJobs() + buildsIndexerActualizationJobs() + projectsIndexerActualizationJobs()
 
 
-    private fun buildsIndexerJobs() =
+    private fun buildsIndexerJobs(): List<Job> =
             serversConfig.servers.map { serverConfig ->
                 jobBuilderFactory.get("buildsIndexerJob${serverConfig.id}")
+                        .incrementer(RunIdIncrementer())
+                        .listener(indexerJobsCoordinatorService)
                         .start(buildsIndexerStep(serverConfig))
                         .build()
             }

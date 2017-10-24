@@ -2,12 +2,14 @@ package com.teamcity.report.batch.reader
 
 import com.teamcity.report.client.TeamCityApiClient
 import com.teamcity.report.client.dto.Build
+import com.teamcity.report.client.dto.Builds
 import com.teamcity.report.config.TeamCityConfig
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemReader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.retry.backoff.ThreadWaitSleeper
 import org.springframework.stereotype.Component
 import java.time.ZonedDateTime
 
@@ -18,6 +20,9 @@ import java.time.ZonedDateTime
 @Component
 @StepScope
 class BuildsActualizationIndexerReader(
+        @Value("#{jobParameters['requestTimeoutMs']}")
+        private val requestTimeoutMs: Long,
+
         @Value("#{jobParameters['actualizationDays']}")
         private val actualizationDays: Long,
 
@@ -58,8 +63,15 @@ class BuildsActualizationIndexerReader(
         val buildsList = builds.build
         logger.info("Got the following builds from server '$serverName' $buildsList")
         start += chunkSize
-        return if (isLastChunk(buildsList)) null else buildsList
+        pauseAfterRead(requestTimeoutMs)
+        return if (isLastChunk(builds) && buildsList.isEmpty()) {
+            null
+        } else {
+            buildsList
+        }
     }
 
-    private fun isLastChunk(builds: List<Build>) = builds.isEmpty()
+    private fun pauseAfterRead(requestTimeoutMs: Long) = ThreadWaitSleeper().sleep(requestTimeoutMs)
+
+    private fun isLastChunk(builds: Builds) = builds.nextHref == null
 }
