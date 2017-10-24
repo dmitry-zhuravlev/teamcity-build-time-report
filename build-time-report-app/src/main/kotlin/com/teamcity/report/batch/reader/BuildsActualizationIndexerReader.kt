@@ -56,7 +56,7 @@ class BuildsActualizationIndexerReader(
         val afterDate = ZonedDateTime.now().minusDays(actualizationDays)
         val builds = client.getBuilds(chunkSize, start, serverConfig, afterDate)
         val buildsList = builds.build
-        logger.info("Got following builds from server '$serverName' $buildsList")
+        logger.info("Got the following builds from server '$serverName' $buildsList")
         start += chunkSize
         return if (isLastChunk(buildsList)) null else buildsList
     }

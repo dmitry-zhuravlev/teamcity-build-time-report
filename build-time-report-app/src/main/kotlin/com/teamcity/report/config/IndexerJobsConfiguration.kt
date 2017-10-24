@@ -1,13 +1,19 @@
 package com.teamcity.report.config
 
 import com.teamcity.report.batch.IndexerJobsCoordinatorService
-import com.teamcity.report.batch.processor.ServerNameEnhancerBuildsProcessor
+import com.teamcity.report.batch.processor.BuildsIndexerProcessor
+import com.teamcity.report.batch.processor.ProjectsIndexerProcessor
 import com.teamcity.report.batch.reader.BuildsActualizationIndexerReader
 import com.teamcity.report.batch.reader.BuildsIndexerReader
+import com.teamcity.report.batch.reader.ProjectsActualizationIndexerReader
 import com.teamcity.report.batch.writer.BuildsIndexerWriter
+import com.teamcity.report.batch.writer.ProjectsIndexerWriter
 import com.teamcity.report.client.TeamCityApiClient
 import com.teamcity.report.client.dto.Build
+import com.teamcity.report.client.dto.Project
 import com.teamcity.report.converters.toJobParameters
+import com.teamcity.report.repository.entity.BuildEntity
+import com.teamcity.report.repository.entity.ProjectEntity
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.configuration.JobRegistry
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
@@ -53,10 +59,22 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     lateinit var buildsActualizationReader: BuildsActualizationIndexerReader
 
     @Autowired
+    lateinit var projectsActualizationReader: ProjectsActualizationIndexerReader
+
+    @Autowired
     lateinit var buildsIndexerReader: BuildsIndexerReader
 
     @Autowired
     lateinit var buildsIndexerWriter: BuildsIndexerWriter
+
+    @Autowired
+    lateinit var projectsIndexerWriter: ProjectsIndexerWriter
+
+    @Autowired
+    lateinit var buildsIndexerProcessor: BuildsIndexerProcessor
+
+    @Autowired
+    lateinit var projectsIndexerProcessor: ProjectsIndexerProcessor
 
 
     @Bean
@@ -85,44 +103,59 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     }
 
     @Bean
-    fun allJobs() = buildsIndexerJobs() + indexerActualizationJobs()
+    fun allJobs() = buildsIndexerJobs() + buildsIndexerActualizationJobs() + projectsIndexerActualizationJobs()
 
 
     private fun buildsIndexerJobs() =
             serversConfig.servers.map { serverConfig ->
-                val buildIndexerStep = buildsIndexerStep(serverConfig)
                 jobBuilderFactory.get("buildsIndexerJob${serverConfig.id}")
-                        .incrementer(RunIdIncrementer())
-                        .start(buildIndexerStep)
+                        .start(buildsIndexerStep(serverConfig))
                         .build()
             }
 
-    private fun indexerActualizationJobs() =
+    private fun buildsIndexerActualizationJobs(): List<Job> =
             serversConfig.servers.map { serverConfig ->
                 jobBuilderFactory.get("buildsIndexerActualizationJob${serverConfig.id}")
                         .incrementer(RunIdIncrementer())
-                        .start(actualizationIndexerStep(serverConfig))
                         .listener(indexerJobsCoordinatorService)
+                        .start(buildsActualizationIndexerStep(serverConfig))
                         .build()
             }
 
-    private fun actualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
-            stepBuilderFactory.get("actualizationIndexerStep")
-                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize.toInt())
+    private fun projectsIndexerActualizationJobs(): List<Job> =
+            serversConfig.servers.map { serverConfig ->
+                jobBuilderFactory.get("projectsIndexerActualizationJob${serverConfig.id}")
+                        .incrementer(RunIdIncrementer())
+                        .listener(indexerJobsCoordinatorService)
+                        .start(projectsActualizationIndexerStep(serverConfig))
+                        .build()
+            }
+
+    private fun buildsActualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
+            stepBuilderFactory.get("buildsActualizationIndexerStep")
+                    .chunk<List<Build>?, List<BuildEntity>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(buildsActualizationReader)
-                    .processor(ServerNameEnhancerBuildsProcessor(serverConfig.name))
+                    .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
+                    .allowStartIfComplete(true)
+                    .build()
+
+    private fun projectsActualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
+            stepBuilderFactory.get("projectsActualizationIndexerStep")
+                    .chunk<List<Project>?, List<ProjectEntity>?>(serverConfig.worker.chunkSize.toInt())
+                    .reader(projectsActualizationReader)
+                    .processor(projectsIndexerProcessor)
+                    .writer(projectsIndexerWriter)
                     .allowStartIfComplete(true)
                     .build()
 
 
     private fun buildsIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
             stepBuilderFactory.get("buildsIndexerStep")
-                    .chunk<List<Build>?, List<Build>?>(serverConfig.worker.chunkSize.toInt())
+                    .chunk<List<Build>?, List<BuildEntity>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(buildsIndexerReader)
-                    .processor(ServerNameEnhancerBuildsProcessor(serverConfig.name))
+                    .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
                     .allowStartIfComplete(true)
                     .build()
-
 }

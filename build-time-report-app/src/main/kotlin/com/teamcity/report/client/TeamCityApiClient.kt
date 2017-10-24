@@ -1,6 +1,7 @@
 package com.teamcity.report.client
 
 import com.teamcity.report.client.dto.Builds
+import com.teamcity.report.client.dto.Projects
 import com.teamcity.report.config.ConfigDefault.WORKER_CHUNK_SIZE
 import com.teamcity.report.config.ConfigDefault.WORKER_START_PAGE
 import com.teamcity.report.config.TeamCityConfig
@@ -12,5 +13,5 @@ import java.time.ZonedDateTime
  */
 interface TeamCityApiClient {
     fun getBuilds(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfig.ServerConfig, afterDate: ZonedDateTime? = null): Builds
-    fun getProjects(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfig.ServerConfig)
+    fun getProjects(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfig.ServerConfig): Projects
 }

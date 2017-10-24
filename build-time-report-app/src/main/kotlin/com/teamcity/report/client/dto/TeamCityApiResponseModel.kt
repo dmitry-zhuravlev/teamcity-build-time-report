@@ -8,10 +8,10 @@ import java.time.ZonedDateTime
  * @author Dmitry Zhuravlev
  *         Date:  19.10.2017
  */
+//builds response model
 data class Builds(val count: Long, val nextHref: String?, val build: List<Build>)
 
-data class Build(var serverName: String? = null,
-                 val id: Long, val buildType: BuildType,
+data class Build(val id: Long, val buildType: BuildType,
                  @JsonFormat(pattern = DATE_PATTERN) val finishDate: ZonedDateTime,
                  val statistics: Statistics)
 
@@ -21,3 +21,9 @@ data class Statistics(val property: List<Property>)
 
 data class Property(val name: String, val value: String)
 
+//projects response model
+data class Projects(val project: List<Project>)
+
+data class Project(val id: String, val name: String, val parentProjectId: String = ROOT_PARENT_PROJECT_ID)
+
+const val ROOT_PARENT_PROJECT_ID = "_Root"

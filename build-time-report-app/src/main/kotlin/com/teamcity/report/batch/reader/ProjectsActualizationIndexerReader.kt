@@ -1,8 +1,7 @@
 package com.teamcity.report.batch.reader
 
 import com.teamcity.report.client.TeamCityApiClient
-import com.teamcity.report.client.dto.Build
-import com.teamcity.report.client.dto.Builds
+import com.teamcity.report.client.dto.Project
 import com.teamcity.report.config.TeamCityConfig
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
@@ -11,14 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
-
 /**
  * @author Dmitry Zhuravlev
- *         Date:  19.10.2017
+ *         Date:  24.10.2017
  */
 @Component
 @StepScope
-class BuildsIndexerReader(
+class ProjectsActualizationIndexerReader(
         @Value("#{jobParameters['start']}")
         private var start: Long,
 
@@ -45,19 +43,18 @@ class BuildsIndexerReader(
 
         @Autowired
         private var client: TeamCityApiClient
-) : ItemReader<List<Build>?> {
+) : ItemReader<List<Project>?> {
 
-    private val logger = LoggerFactory.getLogger(BuildsIndexerReader::class.java)
+    private val logger = LoggerFactory.getLogger(ProjectsActualizationIndexerReader::class.java)
 
-    override fun read(): List<Build>? {
+    override fun read(): List<Project>? {
         val serverConfig = TeamCityConfig.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
-        val builds = client.getBuilds(chunkSize, start, serverConfig)
-        val buildsList = builds.build
-        logger.info("Got the following builds from server '$serverName' $buildsList")
+        val projects = client.getProjects(chunkSize, start, serverConfig)
+        val projectsList = projects.project
+        logger.info("Got the following projects from server '$serverName' $projectsList")
         start += chunkSize
-        return if (isLastChunk(buildsList)) null else buildsList
+        return if (isLastChunk(projectsList)) null else projectsList
     }
 
-    private fun isLastChunk(builds: List<Build>) = builds.isEmpty()
-    private fun isLastChunk(builds: Builds) = builds.nextHref == null
+    private fun isLastChunk(builds: List<Project>) = builds.isEmpty()
 }

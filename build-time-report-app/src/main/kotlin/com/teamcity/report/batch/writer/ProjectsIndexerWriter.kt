@@ -1,7 +1,7 @@
 package com.teamcity.report.batch.writer
 
-import com.teamcity.report.repository.BuildRepository
-import com.teamcity.report.repository.entity.BuildEntity
+import com.teamcity.report.repository.ProjectRepository
+import com.teamcity.report.repository.entity.ProjectEntity
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemWriter
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,20 +11,20 @@ import org.springframework.stereotype.Component
 
 /**
  * @author Dmitry Zhuravlev
- *         Date:  19.10.2017
+ *         Date:  24.10.2017
  */
 @Component
 @StepScope
-class BuildsIndexerWriter(
+class ProjectsIndexerWriter(
         @Value("#{jobParameters['requestTimeoutMs']}")
         private val requestTimeoutMs: Long,
         @Autowired
-        private val repository: BuildRepository
-) : ItemWriter<List<BuildEntity>?> {
-    override fun write(items: MutableList<out List<BuildEntity>?>?) {
+        private val repository: ProjectRepository
+) : ItemWriter<List<ProjectEntity>?> {
+    override fun write(items: MutableList<out List<ProjectEntity>?>?) {
         items?.forEach { item ->
-            item?.forEach { build ->
-                repository.save(build)
+            item?.forEach { project ->
+                repository.save(project)
             }
         }
         ThreadWaitSleeper().sleep(requestTimeoutMs)
