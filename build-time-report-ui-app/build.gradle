@@ -1,0 +1,16 @@
+apply plugin: 'org.springframework.boot'
+
+ext {
+	vaadinVersion = '8.1.0'
+}
+
+dependencies {
+	compile('com.vaadin:vaadin-spring-boot-starter')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+	}
+}

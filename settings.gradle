@@ -1,2 +1,3 @@
 include 'build-time-report-app'
+include 'build-time-report-ui-app'
 

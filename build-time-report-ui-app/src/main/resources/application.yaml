@@ -1,0 +1,5 @@
+server:
+  port: 8223
+vaadin:
+  servlet:
+    production-mode: false

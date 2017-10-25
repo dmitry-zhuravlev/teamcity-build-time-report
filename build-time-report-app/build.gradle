@@ -1,4 +1,4 @@
-
+apply plugin: 'org.springframework.boot'
 
 dependencies {
     compile('com.fasterxml.jackson.module:jackson-module-kotlin:2.8.10')
@@ -7,6 +7,8 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-batch')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-cassandra')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 compileKotlin.dependsOn(processResources)
