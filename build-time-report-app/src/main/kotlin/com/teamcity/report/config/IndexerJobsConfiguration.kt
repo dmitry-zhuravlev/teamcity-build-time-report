@@ -13,6 +13,7 @@ import com.teamcity.report.client.dto.Build
 import com.teamcity.report.client.dto.Project
 import com.teamcity.report.converters.toJobParameters
 import com.teamcity.report.repository.entity.BuildEntity
+import com.teamcity.report.repository.entity.BuildTypeEntity
 import com.teamcity.report.repository.entity.ProjectEntity
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.configuration.JobRegistry
@@ -135,7 +136,7 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun buildsActualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
             stepBuilderFactory.get("buildsActualizationIndexerStep")
-                    .chunk<List<Build>?, List<BuildEntity>?>(serverConfig.worker.chunkSize.toInt())
+                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(buildsActualizationReader)
                     .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
@@ -154,7 +155,7 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun buildsIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
             stepBuilderFactory.get("buildsIndexerStep")
-                    .chunk<List<Build>?, List<BuildEntity>?>(serverConfig.worker.chunkSize.toInt())
+                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(buildsIndexerReader)
                     .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)

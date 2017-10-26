@@ -3,13 +3,20 @@ CREATE KEYSPACE IF NOT EXISTS report WITH REPLICATION = { 'class' : 'NetworkTopo
 CREATE TABLE IF NOT EXISTS report.teamcity_build(
       id bigint,
       buildTypeId text,
-      buildTypeName text,
       projectId text,
       serverName text,
       buildDuration bigint,
       finishDate timestamp,
-      PRIMARY KEY (buildTypeId, finishDate, id, projectId, serverName)
+      PRIMARY KEY (buildTypeId, projectId, serverName, finishDate, id)
  );
+
+ CREATE TABLE IF NOT EXISTS report.teamcity_build_type(
+       buildTypeId text,
+       buildTypeName text,
+       projectId text,
+       serverName text,
+       PRIMARY KEY (projectId, serverName, buildTypeId)
+  );
 
  CREATE TABLE IF NOT EXISTS report.teamcity_project(
       id text,

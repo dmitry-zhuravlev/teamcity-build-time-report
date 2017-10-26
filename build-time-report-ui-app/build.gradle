@@ -6,6 +6,9 @@ ext {
 
 dependencies {
 	compile('com.vaadin:vaadin-spring-boot-starter')
+
+	compile project(':build-time-report-common')
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 

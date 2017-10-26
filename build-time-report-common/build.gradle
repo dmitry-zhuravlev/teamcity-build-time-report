@@ -1,0 +1,10 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-data-cassandra')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+compileKotlin.dependsOn(processResources)
+

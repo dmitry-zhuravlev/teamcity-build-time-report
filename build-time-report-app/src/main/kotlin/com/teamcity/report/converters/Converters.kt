@@ -3,8 +3,7 @@ package com.teamcity.report.converters
 import com.teamcity.report.client.dto.Build
 import com.teamcity.report.client.dto.Project
 import com.teamcity.report.config.TeamCityConfig
-import com.teamcity.report.repository.entity.BuildEntity
-import com.teamcity.report.repository.entity.ProjectEntity
+import com.teamcity.report.repository.entity.*
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.JobParametersBuilder
 import java.time.ZonedDateTime
@@ -14,11 +13,13 @@ import java.time.ZonedDateTime
  *         Date: 22/10/2017
  */
 
-fun Build.toEntity(serverName: String) = BuildEntity(id, buildType.id, buildType.name, buildType.projectId, finishDate.toMilli(),
-        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLong() ?: 0, //TODO perform additional checks
-        serverName)
+fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id, buildType.projectId, finishDate.toMilli(), id, serverName),
+        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLong() ?: 0 //TODO perform additional checks
+)
 
-fun Project.toEntity(serverName: String) = ProjectEntity(id, name, parentProjectId, serverName)
+fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(buildType.projectId, buildType.id, serverName), buildType.name)
+
+fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(id, parentProjectId, serverName), name)
 
 fun ZonedDateTime.toMilli() = toInstant().toEpochMilli()
 

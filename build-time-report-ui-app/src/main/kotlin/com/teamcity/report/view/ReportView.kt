@@ -1,10 +1,12 @@
 package com.teamcity.report.view
 
 import com.teamcity.report.model.ProjectOrBuild
+import com.teamcity.report.service.ReportTableModelLoader
 import com.vaadin.navigator.View
 import com.vaadin.spring.annotation.SpringView
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
@@ -19,11 +21,14 @@ class ReportView : VerticalLayout(), View {
         const val DATE_FORMAT = "yyyy/MM/dd HH:mmZ"
     }
 
+    @Autowired
+    lateinit var reportTableModelLoader: ReportTableModelLoader
+
     @PostConstruct
     fun init() {
         setSizeFull()
         addComponent(CssLayout(
-                Label("Time report interval"), Label(":"), fromDateTimeField(), Label("-"), toDateTimeField(),
+                Label("Time report interval"), Label(":"), fromDateTimeField(), Label("-"), toDateTimeField(), Label("ServerName:"), TextField(),
                 refreshButton()
         ).apply {
             addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP)
@@ -38,7 +43,7 @@ class ReportView : VerticalLayout(), View {
 
         addColumn(ProjectOrBuild::name).setCaption("Project/Configuration Name")
         addColumn(ProjectOrBuild::calculateDuration).setCaption("Duration (Sec)")
-        setItems(testReportData(), ProjectOrBuild::childrens)
+        setItems(/*testReportData()*/reportTableModelLoader.loadReportModel("Local TeamCity", 100L, "2018-01-01 00:00:00+0300", "2013-01-01 00:00:00+0300"), ProjectOrBuild::childrens) //TODO remove hardcoded params
     }
 
     private fun fromDateTimeField() = DateTimeField().apply {
