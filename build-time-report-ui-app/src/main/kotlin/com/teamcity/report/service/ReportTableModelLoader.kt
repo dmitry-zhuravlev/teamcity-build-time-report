@@ -1,9 +1,12 @@
 package com.teamcity.report.service
 
-import com.teamcity.report.model.ProjectOrBuild
+import com.teamcity.report.model.ReportTableNode
 import com.teamcity.report.repository.BuildRepository
 import com.teamcity.report.repository.BuildTypeRepository
 import com.teamcity.report.repository.ProjectRepository
+import com.teamcity.report.repository.entity.BuildTypeEntity
+import com.teamcity.report.repository.entity.ProjectEntity
+import com.teamcity.report.repository.entity.ROOT_PARENT_PROJECT_ID
 import com.vaadin.spring.annotation.SpringComponent
 import com.vaadin.spring.annotation.ViewScope
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,18 +27,34 @@ class ReportTableModelLoader {
     @Autowired
     lateinit var projectRepository: ProjectRepository
 
-    fun loadReportModel(serverName: String, limit: Long, beforeFinishDate: String, afterFinishDate: String): List<ProjectOrBuild> {
-        //TODO fix draft implementation
-        val projectsMap = projectRepository.getProjects(serverName, limit).map { project -> project.key.id to ProjectOrBuild(project.name) }.toMap()
-        val buildTypesMap = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectsMap.keys.toList(), serverName, limit)
-                .map { buildType -> (buildType.key.buildTypeId to buildType.key.projectId) to ProjectOrBuild(buildType.buildTypeName) }.toMap()
-        buildTypesMap.keys.forEach { (buildTypeId, projectId) ->
-            buildTypesMap[buildTypeId to projectId]?.duration = buildRepository.sumBuildDurations(buildTypeId, projectId, serverName, beforeFinishDate, afterFinishDate)
+    fun loadReportModel(serverName: String, limit: Long, beforeFinishDate: String, afterFinishDate: String): List<ReportTableNode> {
+        val projectsByIdMap = projectRepository.getProjects(serverName, limit)
+                .map { project -> project.key.id to project }.toMap()
+        val buildTypesByIdMap = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectsByIdMap.keys.toList(), serverName, limit)
+                .map { buildType -> (buildType.key.buildTypeId) to buildType }.toMap()
+
+        val result = mutableMapOf<String, ReportTableNode>()
+
+        projectsByIdMap.values.forEach { project ->
+            result[project.key.id] = project.toTableNode().apply { parentId = project.key.parentProjectId }
         }
-        return buildTypesMap.values + projectsMap.values
-        /*resultModel.values.forEach {projectOrBuild->
-            projectOrBuild
-        }*/
+
+        buildTypesByIdMap.values.forEach { buildType ->
+            val buildTypeNode = buildType.toTableNode().apply { parentId = result[buildType.key.projectId]?.parentId ?: ROOT_PARENT_PROJECT_ID }
+            buildTypeNode.duration = buildRepository.sumBuildDurations(buildType.key.buildTypeId, buildType.key.projectId, serverName, beforeFinishDate, afterFinishDate)
+            result[buildType.key.projectId]?.childrens?.add(buildTypeNode)
+        }
+
+        result.values.forEach { item ->
+            val possibleParent = result[item.parentId]
+            possibleParent?.childrens?.add(item)
+        }
+
+        return result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toList()
     }
+
+    private fun BuildTypeEntity.toTableNode() = ReportTableNode(buildTypeName)
+
+    private fun ProjectEntity.toTableNode() = ReportTableNode(name)
 
 }

@@ -1,6 +1,6 @@
 package com.teamcity.report.view
 
-import com.teamcity.report.model.ProjectOrBuild
+import com.teamcity.report.model.ReportTableNode
 import com.teamcity.report.service.ReportTableModelLoader
 import com.vaadin.navigator.View
 import com.vaadin.spring.annotation.SpringView
@@ -38,12 +38,12 @@ class ReportView : VerticalLayout(), View {
         setExpandRatio(treeGrid, 1.0f)
     }
 
-    private fun treeGrid() = TreeGrid<ProjectOrBuild>().apply {
+    private fun treeGrid() = TreeGrid<ReportTableNode>().apply {
         setSizeFull()
 
-        addColumn(ProjectOrBuild::name).setCaption("Project/Configuration Name")
-        addColumn(ProjectOrBuild::calculateDuration).setCaption("Duration (Sec)")
-        setItems(/*testReportData()*/reportTableModelLoader.loadReportModel("Local TeamCity", 100L, "2018-01-01 00:00:00+0300", "2013-01-01 00:00:00+0300"), ProjectOrBuild::childrens) //TODO remove hardcoded params
+        addColumn(ReportTableNode::name).setCaption("Project/Configuration Name")
+        addColumn(ReportTableNode::calculateDuration).setCaption("Duration (Sec)")
+        setItems(/*testReportData()*/reportTableModelLoader.loadReportModel("Local TeamCity", 100L, "2018-01-01 00:00:00+0300", "2013-01-01 00:00:00+0300"), ReportTableNode::childrens) //TODO remove hardcoded params
     }
 
     private fun fromDateTimeField() = DateTimeField().apply {
@@ -60,7 +60,7 @@ class ReportView : VerticalLayout(), View {
 }
 
 
-fun testReportData() = listOf(
+/*fun testReportData() = listOf(
         ProjectOrBuild("Test Project1", childrens = listOf(
                 ProjectOrBuild("Test Sub project1", 1L),
                 ProjectOrBuild("Test Sub project2", 2L, childrens = listOf(
@@ -70,4 +70,4 @@ fun testReportData() = listOf(
                 ProjectOrBuild("Test Sub project3", 3L),
                 ProjectOrBuild("Test Sub project4", 4L))),
         ProjectOrBuild("Test Project2", 5L)
-)
+) */
