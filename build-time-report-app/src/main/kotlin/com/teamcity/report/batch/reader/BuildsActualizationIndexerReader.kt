@@ -27,7 +27,7 @@ class BuildsActualizationIndexerReader(
         private val actualizationDays: Long,
 
         @Value("#{jobParameters['start']}")
-        private var start: Long,
+        private val initialStart: Long,
 
         @Value("#{jobParameters['chunkSize']}")
         private val chunkSize: Long,
@@ -56,13 +56,15 @@ class BuildsActualizationIndexerReader(
 
     private val logger = LoggerFactory.getLogger(BuildsActualizationIndexerReader::class.java)
 
+    var currentStart = initialStart
+
     override fun read(): List<Build>? {
         val serverConfig = TeamCityConfig.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
         val afterDate = ZonedDateTime.now().minusDays(actualizationDays)
-        val builds = client.getBuilds(chunkSize, start, serverConfig, afterDate)
+        val builds = client.getBuilds(chunkSize, currentStart, serverConfig, afterDate)
         val buildsList = builds.build
         logger.info("Got the following builds from server '$serverName' $buildsList")
-        start += chunkSize
+        currentStart += chunkSize
         pauseAfterRead(requestTimeoutMs)
         return if (isLastChunk(builds) && buildsList.isEmpty()) {
             null

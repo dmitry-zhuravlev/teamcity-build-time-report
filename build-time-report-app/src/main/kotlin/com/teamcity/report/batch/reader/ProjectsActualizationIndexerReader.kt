@@ -23,7 +23,7 @@ class ProjectsActualizationIndexerReader(
         private val requestTimeoutMs: Long,
 
         @Value("#{jobParameters['start']}")
-        private var start: Long,
+        private val initialStart: Long,
 
         @Value("#{jobParameters['chunkSize']}")
         private val chunkSize: Long,
@@ -52,12 +52,14 @@ class ProjectsActualizationIndexerReader(
 
     private val logger = LoggerFactory.getLogger(ProjectsActualizationIndexerReader::class.java)
 
+    var currentStart = initialStart
+
     override fun read(): List<Project>? {
         val serverConfig = TeamCityConfig.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
-        val projects = client.getProjects(chunkSize, start, serverConfig)
+        val projects = client.getProjects(chunkSize, currentStart, serverConfig)
         val projectsList = projects.project
         logger.info("Got the following projects from server '$serverName' $projectsList")
-        start += chunkSize
+        currentStart += chunkSize
         pauseAfterRead(requestTimeoutMs)
         return if (isLastChunk(projects) && projectsList.isEmpty()) {
             null

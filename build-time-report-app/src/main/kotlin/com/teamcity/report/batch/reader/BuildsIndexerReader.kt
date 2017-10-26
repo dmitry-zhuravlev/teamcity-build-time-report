@@ -9,6 +9,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemReader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.retry.backoff.ThreadWaitSleeper
 import org.springframework.stereotype.Component
 
 
@@ -20,7 +21,10 @@ import org.springframework.stereotype.Component
 @StepScope
 class BuildsIndexerReader(
         @Value("#{jobParameters['start']}")
-        private var start: Long,
+        private val initialStart: Long,
+
+        @Value("#{jobParameters['requestTimeoutMs']}")
+        private val requestTimeoutMs: Long,
 
         @Value("#{jobParameters['chunkSize']}")
         private val chunkSize: Long,
@@ -49,15 +53,23 @@ class BuildsIndexerReader(
 
     private val logger = LoggerFactory.getLogger(BuildsIndexerReader::class.java)
 
+    var currentStart = initialStart
+
     override fun read(): List<Build>? {
         val serverConfig = TeamCityConfig.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
-        val builds = client.getBuilds(chunkSize, start, serverConfig)
+        val builds = client.getBuilds(chunkSize, currentStart, serverConfig)
         val buildsList = builds.build
         logger.info("Got the following builds from server '$serverName' $buildsList")
-        start += chunkSize
-        return if (isLastChunk(buildsList)) null else buildsList
+        currentStart += chunkSize
+        pauseAfterRead(requestTimeoutMs)
+        return if (isLastChunk(builds) && buildsList.isEmpty()) {
+            null
+        } else {
+            buildsList
+        }
     }
 
-    private fun isLastChunk(builds: List<Build>) = builds.isEmpty()
+    private fun pauseAfterRead(requestTimeoutMs: Long) = ThreadWaitSleeper().sleep(requestTimeoutMs)
+
     private fun isLastChunk(builds: Builds) = builds.nextHref == null
 }
