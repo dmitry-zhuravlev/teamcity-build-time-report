@@ -13,8 +13,8 @@ import org.springframework.data.repository.query.Param
 interface BuildTypeRepository : Repository<BuildTypeEntity, BuildTypeEntityKey> {
     fun save(build: BuildTypeEntity): BuildTypeEntity
 
-    @Query("select * from report.teamcity_build_type where projectId in (:projectIds) and serverName=:serverName limit :lim")
+    @Query("select * from report.teamcity_build_type where projectId in (:projectIds) and serverName=:serverName limit :limit")
     fun getBuildTypesByProjectIdsAndServerNames(@Param("projectIds") projectIds: List<String>,
                                                 @Param("serverName") serverName: String,
-                                                @Param("lim") limit: Long): List<BuildTypeEntity>
+                                                @Param("limit") limit: Long): List<BuildTypeEntity>
 }

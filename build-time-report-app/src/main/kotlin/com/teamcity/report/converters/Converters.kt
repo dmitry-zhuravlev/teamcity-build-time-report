@@ -17,9 +17,9 @@ fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id
         statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLong() ?: 0 //TODO perform additional checks
 )
 
-fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(buildType.projectId, buildType.id, serverName), buildType.name)
+fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, buildType.projectId, buildType.id), buildType.name)
 
-fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(id, parentProjectId, serverName), name)
+fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(serverName, id, parentProjectId), name)
 
 fun ZonedDateTime.toMilli() = toInstant().toEpochMilli()
 

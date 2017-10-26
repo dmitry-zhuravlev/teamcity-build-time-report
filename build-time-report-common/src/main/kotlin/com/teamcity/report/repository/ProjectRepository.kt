@@ -13,6 +13,6 @@ import org.springframework.data.repository.query.Param
 interface ProjectRepository : Repository<ProjectEntity, ProjectEntityKey> {
     fun save(project: ProjectEntity): ProjectEntity
 
-    @Query("select * from report.teamcity_project where serverName=:serverName limit :lim")
-    fun getProjects(@Param("serverName") serverName: String, @Param("lim") limit: Long): List<ProjectEntity>
+    @Query("select * from report.teamcity_project where serverName=:serverName limit :limit")
+    fun getProjects(@Param("serverName") serverName: String, @Param("limit") limit: Long): List<ProjectEntity>
 }

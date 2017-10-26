@@ -40,11 +40,11 @@ data class BuildTypeEntity(
 @PrimaryKeyClass
 data class BuildTypeEntityKey(
         @PrimaryKeyColumn(type = PARTITIONED)
+        val serverName: String,
+        @PrimaryKeyColumn(type = CLUSTERED)
         val projectId: String,
         @PrimaryKeyColumn(type = CLUSTERED)
-        val buildTypeId: String,
-        @PrimaryKeyColumn(type = CLUSTERED)
-        val serverName: String) : Serializable
+        val buildTypeId: String) : Serializable
 
 @Table("teamcity_project")
 data class ProjectEntity(
@@ -55,10 +55,10 @@ data class ProjectEntity(
 @PrimaryKeyClass
 data class ProjectEntityKey(
         @PrimaryKeyColumn(type = PARTITIONED)
+        val serverName: String,
+        @PrimaryKeyColumn(type = CLUSTERED)
         val id: String,
         @PrimaryKeyColumn(type = CLUSTERED)
-        val parentProjectId: String = ROOT_PARENT_PROJECT_ID,
-        @PrimaryKeyColumn(type = CLUSTERED)
-        val serverName: String) : Serializable
+        val parentProjectId: String = ROOT_PARENT_PROJECT_ID) : Serializable
 
 const val ROOT_PARENT_PROJECT_ID = "_Root"
