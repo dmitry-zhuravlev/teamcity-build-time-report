@@ -4,6 +4,8 @@ ext {
 	vaadinVersion = '8.1.0'
 }
 
+apply plugin: "io.spring.dependency-management"
+
 dependencies {
 	compile('com.vaadin:vaadin-spring-boot-starter')
 

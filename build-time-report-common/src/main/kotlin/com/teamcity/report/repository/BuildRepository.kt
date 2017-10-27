@@ -22,6 +22,6 @@ interface BuildRepository : Repository<BuildEntity, BuildEntityKey> {
     fun sumBuildDurations(@Param("buildTypeId") buildTypeId: String,
                           @Param("projectId") projectId: String,
                           @Param("serverName") serverName: String,
-                          @Param("beforeFinishDate") beforeFinishDate: String,
-                          @Param("afterFinishDate") afterFinishDate: String): Long
+                          @Param("beforeFinishDate") beforeFinishDate: Long,
+                          @Param("afterFinishDate") afterFinishDate: Long): Long
 }

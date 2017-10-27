@@ -8,7 +8,9 @@ import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.annotation.PostConstruct
+
 
 /**
  * @author Dmitry Zhuravlev
@@ -24,39 +26,56 @@ class ReportView : VerticalLayout(), View {
     @Autowired
     lateinit var reportTableModelLoader: ReportTableModelLoader
 
+    lateinit var treeGrid: TreeGrid<ReportTableNode>
+    lateinit var fromDateTimeField: DateTimeField
+    lateinit var toDateTimeField: DateTimeField
+    lateinit var serverNameField: TextField
+
     @PostConstruct
     fun init() {
         setSizeFull()
         addComponent(CssLayout(
-                Label("Time report interval"), Label(":"), fromDateTimeField(), Label("-"), toDateTimeField(), Label("ServerName:"), TextField(),
+                Label("Time report interval"), Label(":"), fromDateTimeField(), Label("-"), toDateTimeField(), Label("ServerName:"), serverNameField(),
                 refreshButton()
         ).apply {
             addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP)
         })
-        val treeGrid = treeGrid()
-        addComponent(treeGrid)
+        addComponent(treeGrid())
         setExpandRatio(treeGrid, 1.0f)
+    }
+
+    private fun serverNameField() = TextField().apply {
+        value = "Local TeamCity" //TODO load from server
+        serverNameField = this
     }
 
     private fun treeGrid() = TreeGrid<ReportTableNode>().apply {
         setSizeFull()
-
         addColumn(ReportTableNode::name).setCaption("Project/Configuration Name")
         addColumn(ReportTableNode::calculateDuration).setCaption("Duration (Sec)")
-        setItems(/*testReportData()*/reportTableModelLoader.loadReportModel("Local TeamCity", 100L, "2018-01-01 00:00:00+0300", "2013-01-01 00:00:00+0300"), ReportTableNode::childrens) //TODO remove hardcoded params
+        treeGrid = this
     }
 
     private fun fromDateTimeField() = DateTimeField().apply {
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now().minusDays(5)
+        fromDateTimeField = this
     }
 
     private fun toDateTimeField() = DateTimeField().apply {
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now()
+        toDateTimeField = this
     }
 
-    private fun refreshButton() = Button("Refresh")
+    private fun refreshButton() = Button("Refresh").apply {
+        addClickListener {
+            val beforeFinishDate = toDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val afterFinishDate = fromDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val serverName = serverNameField.value
+            treeGrid.setItems(/*testReportData()*/reportTableModelLoader.loadReportModel(serverName, beforeFinishDate, afterFinishDate, 0, 100), ReportTableNode::childrens) //TODO remove hardcoded params
+        }
+    }
 }
 
 

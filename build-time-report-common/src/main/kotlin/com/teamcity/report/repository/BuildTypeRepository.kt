@@ -2,9 +2,14 @@ package com.teamcity.report.repository
 
 import com.teamcity.report.repository.entity.BuildTypeEntity
 import com.teamcity.report.repository.entity.BuildTypeEntityKey
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.cassandra.core.query.CassandraPageRequest
 import org.springframework.data.cassandra.repository.Query
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.repository.Repository
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Component
 
 /**
  * @author Dmitry Zhuravlev
@@ -13,8 +18,29 @@ import org.springframework.data.repository.query.Param
 interface BuildTypeRepository : Repository<BuildTypeEntity, BuildTypeEntityKey> {
     fun save(build: BuildTypeEntity): BuildTypeEntity
 
-    @Query("select * from report.teamcity_build_type where projectId in (:projectIds) and serverName=:serverName limit :limit")
+    @Query("select * from report.teamcity_build_type where projectId in :projectIds and serverName=:serverName")
     fun getBuildTypesByProjectIdsAndServerNames(@Param("projectIds") projectIds: List<String>,
                                                 @Param("serverName") serverName: String,
-                                                @Param("limit") limit: Long): List<BuildTypeEntity>
+                                                pageable: Pageable): Slice<BuildTypeEntity>
+
+    @Query("select count(*) from report.teamcity_build_type where serverName=:serverName")
+    fun count(@Param("serverName") serverName: String): Int
+}
+
+@Component
+class PageableBuildTypeRepository {
+    @Autowired
+    lateinit var buildTypeRepository: BuildTypeRepository
+
+    fun getBuildTypesByProjectIdsAndServerNames(projectIds: List<String>, serverName: String, page: Int, size: Int): List<BuildTypeEntity> {
+        var buildTypesSlice = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectIds, serverName, CassandraPageRequest.of(0, size))
+        for (i in 1..page) {
+            if (buildTypesSlice.hasNext()) {
+                buildTypesSlice = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectIds, serverName, buildTypesSlice.nextPageable())
+            } else return emptyList()
+        }
+        return buildTypesSlice.content
+    }
+
+    fun count(serverName: String) = buildTypeRepository.count(serverName)
 }

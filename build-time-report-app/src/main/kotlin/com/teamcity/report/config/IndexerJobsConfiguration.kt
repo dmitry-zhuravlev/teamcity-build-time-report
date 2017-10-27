@@ -17,6 +17,7 @@ import com.teamcity.report.repository.entity.BuildTypeEntity
 import com.teamcity.report.repository.entity.ProjectEntity
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.configuration.JobRegistry
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import javax.sql.DataSource
 
 
 /**
@@ -40,7 +42,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 @Configuration
 @EnableBatchProcessing
 @EnableAsync
-class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
+class IndexerJobsConfiguration : DefaultBatchConfigurer() {
     @Autowired
     lateinit var jobBuilderFactory: JobBuilderFactory
 
@@ -77,6 +79,8 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     @Autowired
     lateinit var projectsIndexerProcessor: ProjectsIndexerProcessor
 
+
+    override fun setDataSource(dataSource: DataSource?) {}
 
     @Bean
     fun taskExecutor() = ThreadPoolTaskExecutor().apply {

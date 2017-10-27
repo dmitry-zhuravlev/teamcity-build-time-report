@@ -7,6 +7,7 @@ import com.teamcity.report.config.TeamCityConfig
 import org.springframework.http.client.support.BasicAuthorizationInterceptor
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.util.UriComponentsBuilder
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -21,12 +22,14 @@ class TeamCityApiClientImpl : TeamCityApiClient {
 
     //TODO make configurable
     private fun buildsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfig.ServerConfig, afterDate: ZonedDateTime?)
-            = "${serverConfig.url}/httpAuth/app/rest/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDatePathParam(afterDate)}"
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/httpAuth/app/rest/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDatePathParam(afterDate)}")
+            .build(true).toUri()
 
     private fun projectsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfig.ServerConfig)
-            = "${serverConfig.url}/app/rest/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start"
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/app/rest/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
+            .build(true).toUri()
 
-    private fun afterDatePathParam(afterDate: ZonedDateTime?) = if (afterDate == null) "" else ",finishDate:(date:${dateFormat.format(afterDate)},condition:after)"
+    private fun afterDatePathParam(afterDate: ZonedDateTime?) = if (afterDate == null) "" else ",finishDate:(date:${dateFormat.format(afterDate).replace("+", "%2B")},condition:after)"
 
     private fun restTemplate(serverConfig: TeamCityConfig.ServerConfig) = RestTemplate().apply {
         interceptors.add(BasicAuthorizationInterceptor(serverConfig.username, serverConfig.password)) //TODO extract from here

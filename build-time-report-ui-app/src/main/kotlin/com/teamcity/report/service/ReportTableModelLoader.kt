@@ -2,8 +2,8 @@ package com.teamcity.report.service
 
 import com.teamcity.report.model.ReportTableNode
 import com.teamcity.report.repository.BuildRepository
-import com.teamcity.report.repository.BuildTypeRepository
-import com.teamcity.report.repository.ProjectRepository
+import com.teamcity.report.repository.PageableBuildTypeRepository
+import com.teamcity.report.repository.PageableProjectRepository
 import com.teamcity.report.repository.entity.BuildTypeEntity
 import com.teamcity.report.repository.entity.ProjectEntity
 import com.teamcity.report.repository.entity.ROOT_PARENT_PROJECT_ID
@@ -22,15 +22,21 @@ class ReportTableModelLoader {
     lateinit var buildRepository: BuildRepository
 
     @Autowired
-    lateinit var buildTypeRepository: BuildTypeRepository
+    lateinit var buildTypeRepository: PageableBuildTypeRepository
 
     @Autowired
-    lateinit var projectRepository: ProjectRepository
+    lateinit var projectRepository: PageableProjectRepository
 
-    fun loadReportModel(serverName: String, limit: Long, beforeFinishDate: String, afterFinishDate: String): List<ReportTableNode> {
-        val projectsByIdMap = projectRepository.getProjects(serverName, limit)
+    fun count(serverName: String): Int {
+        val projectsCount = projectRepository.count(serverName)
+        val buildTypesCount = buildTypeRepository.count(serverName)
+        return Math.max(projectsCount, buildTypesCount)
+    }
+
+    fun loadReportModel(serverName: String, beforeFinishDate: Long, afterFinishDate: Long, page: Int, size: Int): List<ReportTableNode> {
+        val projectsByIdMap = projectRepository.getProjects(serverName, page, size)
                 .map { project -> project.key.id to project }.toMap()
-        val buildTypesByIdMap = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectsByIdMap.keys.toList(), serverName, limit)
+        val buildTypesByIdMap = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectsByIdMap.keys.toList(), serverName, page, size)
                 .map { buildType -> (buildType.key.buildTypeId) to buildType }.toMap()
 
         val result = mutableMapOf<String, ReportTableNode>()

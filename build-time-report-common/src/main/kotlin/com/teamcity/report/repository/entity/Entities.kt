@@ -1,11 +1,11 @@
 package com.teamcity.report.repository.entity
 
-import org.springframework.cassandra.core.PrimaryKeyType.CLUSTERED
-import org.springframework.cassandra.core.PrimaryKeyType.PARTITIONED
-import org.springframework.data.cassandra.mapping.PrimaryKey
-import org.springframework.data.cassandra.mapping.PrimaryKeyClass
-import org.springframework.data.cassandra.mapping.PrimaryKeyColumn
-import org.springframework.data.cassandra.mapping.Table
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType.CLUSTERED
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType.PARTITIONED
+import org.springframework.data.cassandra.core.mapping.PrimaryKey
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn
+import org.springframework.data.cassandra.core.mapping.Table
 import java.io.Serializable
 
 /**
