@@ -8,6 +8,7 @@ import org.springframework.batch.core.listener.JobExecutionListenerSupport
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
@@ -23,7 +24,7 @@ class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
     @Autowired
     lateinit var jobOperator: JobOperator
 
-    var terminatedIndexerJobsExecutions = mutableMapOf<String, Long>()
+    var terminatedIndexerJobsExecutions = ConcurrentHashMap<String, Long>()
 
     fun forceTerminateIndexerJob(jobName: String) = {
         jobOperator.getRunningExecutions(jobName).forEach { jobExecutionId ->

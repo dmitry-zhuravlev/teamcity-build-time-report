@@ -21,11 +21,12 @@ class BuildsIndexerWriter(
         @Autowired
         private val buildTypesRepository: BuildTypeRepository
 ) : ItemWriter<List<Pair<BuildTypeEntity, BuildEntity>>?> {
+
     override fun write(items: MutableList<out List<Pair<BuildTypeEntity, BuildEntity>>?>?) {
-        items?.forEach { item ->
-            item?.forEach { (buildType, build) ->
-                buildTypesRepository.save(buildType)
-                buildsRepository.save(build)
+        items?.forEach { buildsAndBuildTypes ->
+            if (buildsAndBuildTypes != null) {
+                buildTypesRepository.saveAll(buildsAndBuildTypes.map { (buildType, _) -> buildType })
+                buildsRepository.saveAll(buildsAndBuildTypes.map { (_, build) -> build })
             }
         }
     }

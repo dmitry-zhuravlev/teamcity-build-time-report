@@ -4,7 +4,6 @@ import com.teamcity.report.client.dto.Build
 import com.teamcity.report.client.dto.Project
 import com.teamcity.report.config.TeamCityConfig
 import com.teamcity.report.repository.entity.*
-import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.JobParametersBuilder
 import java.time.ZonedDateTime
 
@@ -14,7 +13,7 @@ import java.time.ZonedDateTime
  */
 
 fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id, buildType.projectId, finishDate.toMilli(), id, serverName),
-        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLong() ?: 0 //TODO perform additional checks
+        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLongSafe()/*?.let { TimeUnit.MILLISECONDS.toSeconds(it) }*/ ?: 0
 )
 
 fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, buildType.projectId, buildType.id), buildType.name)
@@ -23,7 +22,13 @@ fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(server
 
 fun ZonedDateTime.toMilli() = toInstant().toEpochMilli()
 
-fun TeamCityConfig.toJobParameters(): List<JobParameters> = servers.map { serverConfig ->
+fun String?.toLongSafe(): Long? = try {
+    this?.toLong()
+} catch (e: NumberFormatException) {
+    0
+}
+
+fun TeamCityConfig.toJobParameters() = servers.map { serverConfig ->
     JobParametersBuilder()
             .addLong("actualizationDays", serverConfig.worker.actualizationDays)
             .addLong("start", serverConfig.worker.startPage)
@@ -36,4 +41,4 @@ fun TeamCityConfig.toJobParameters(): List<JobParameters> = servers.map { server
             .addString("userName", serverConfig.username)
             .addString("userPassword", serverConfig.password)
             .toJobParameters()
-}.toList()
+}

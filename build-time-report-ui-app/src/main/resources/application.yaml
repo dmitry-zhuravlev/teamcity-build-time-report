@@ -1,5 +1,10 @@
 server:
   port: 8223
+spring:
+ data:
+     cassandra:
+       keyspace-name: report
+       contact-points: localhost
 vaadin:
   servlet:
     production-mode: false

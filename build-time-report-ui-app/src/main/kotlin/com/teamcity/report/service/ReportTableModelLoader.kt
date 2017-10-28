@@ -46,7 +46,7 @@ class ReportTableModelLoader {
         }
 
         buildTypesByIdMap.values.forEach { buildType ->
-            val buildTypeNode = buildType.toTableNode().apply { parentId = result[buildType.key.projectId]?.parentId ?: ROOT_PARENT_PROJECT_ID }
+            val buildTypeNode = buildType.toTableNode()
             buildTypeNode.duration = buildRepository.sumBuildDurations(buildType.key.buildTypeId, buildType.key.projectId, serverName, beforeFinishDate, afterFinishDate)
             result[buildType.key.projectId]?.childrens?.add(buildTypeNode)
         }
@@ -56,11 +56,12 @@ class ReportTableModelLoader {
             possibleParent?.childrens?.add(item)
         }
 
-        return result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toList()
+        return listOf(ReportTableNode("_RootTotal", "Total", 0,
+                childrens = result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toMutableList()))
     }
 
-    private fun BuildTypeEntity.toTableNode() = ReportTableNode(buildTypeName)
+    private fun BuildTypeEntity.toTableNode() = ReportTableNode(key.buildTypeId, buildTypeName)
 
-    private fun ProjectEntity.toTableNode() = ReportTableNode(name)
+    private fun ProjectEntity.toTableNode() = ReportTableNode(key.id, name)
 
 }

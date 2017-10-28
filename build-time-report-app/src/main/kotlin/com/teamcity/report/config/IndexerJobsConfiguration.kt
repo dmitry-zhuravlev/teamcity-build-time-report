@@ -12,9 +12,11 @@ import com.teamcity.report.client.TeamCityApiClient
 import com.teamcity.report.client.dto.Build
 import com.teamcity.report.client.dto.Project
 import com.teamcity.report.converters.toJobParameters
+import com.teamcity.report.repository.ServerRepository
 import com.teamcity.report.repository.entity.BuildEntity
 import com.teamcity.report.repository.entity.BuildTypeEntity
 import com.teamcity.report.repository.entity.ProjectEntity
+import com.teamcity.report.repository.entity.ServerEntity
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.configuration.JobRegistry
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer
@@ -31,6 +33,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 
@@ -79,8 +82,18 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
     @Autowired
     lateinit var projectsIndexerProcessor: ProjectsIndexerProcessor
 
+    @Autowired
+    lateinit var serverRepository: ServerRepository
+
 
     override fun setDataSource(dataSource: DataSource?) {}
+
+    @PostConstruct
+    fun saveServers() = serversConfig.servers
+            .map { server -> ServerEntity(server.name) }
+            .toList()
+            .run { serverRepository.saveAll(this) }
+
 
     @Bean
     fun taskExecutor() = ThreadPoolTaskExecutor().apply {

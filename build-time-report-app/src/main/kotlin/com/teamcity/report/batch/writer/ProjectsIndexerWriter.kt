@@ -17,11 +17,10 @@ class ProjectsIndexerWriter(
         @Autowired
         private val repository: ProjectRepository
 ) : ItemWriter<List<ProjectEntity>?> {
+
     override fun write(items: MutableList<out List<ProjectEntity>?>?) {
-        items?.forEach { item ->
-            item?.forEach { project ->
-                repository.save(project)
-            }
+        items?.forEach { projects ->
+            if (projects != null) repository.saveAll(projects)
         }
     }
 }

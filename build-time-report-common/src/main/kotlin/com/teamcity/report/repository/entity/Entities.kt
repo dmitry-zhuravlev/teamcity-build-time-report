@@ -61,4 +61,9 @@ data class ProjectEntityKey(
         @PrimaryKeyColumn(type = CLUSTERED)
         val parentProjectId: String = ROOT_PARENT_PROJECT_ID) : Serializable
 
+@Table("teamcity_server")
+data class ServerEntity(
+        @PrimaryKey
+        val serverName: String)
+
 const val ROOT_PARENT_PROJECT_ID = "_Root"

@@ -25,3 +25,8 @@ CREATE TABLE IF NOT EXISTS report.teamcity_build(
       serverName text,
       PRIMARY KEY (serverName, id, parentProjectId)
  );
+
+ CREATE TABLE IF NOT EXISTS report.teamcity_server(
+      serverName text,
+      PRIMARY KEY (serverName)
+ );

@@ -4,10 +4,10 @@ import com.teamcity.report.repository.entity.ProjectEntity
 import com.teamcity.report.repository.entity.ProjectEntityKey
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.cassandra.core.query.CassandraPageRequest
+import org.springframework.data.cassandra.repository.CassandraRepository
 import org.springframework.data.cassandra.repository.Query
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
-import org.springframework.data.repository.Repository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Component
 
@@ -15,9 +15,7 @@ import org.springframework.stereotype.Component
  * @author Dmitry Zhuravlev
  *         Date:  24.10.2017
  */
-interface ProjectRepository : Repository<ProjectEntity, ProjectEntityKey> {
-    fun save(project: ProjectEntity): ProjectEntity
-
+interface ProjectRepository : CassandraRepository<ProjectEntity, ProjectEntityKey> {
     @Query("select * from report.teamcity_project where serverName=:serverName")
     fun getProjects(@Param("serverName") serverName: String, pageable: Pageable): Slice<ProjectEntity>
 
