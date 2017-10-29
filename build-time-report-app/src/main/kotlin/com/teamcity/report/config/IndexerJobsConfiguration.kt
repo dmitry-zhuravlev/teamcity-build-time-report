@@ -8,7 +8,6 @@ import com.teamcity.report.batch.reader.BuildsIndexerReader
 import com.teamcity.report.batch.reader.ProjectsActualizationIndexerReader
 import com.teamcity.report.batch.writer.BuildsIndexerWriter
 import com.teamcity.report.batch.writer.ProjectsIndexerWriter
-import com.teamcity.report.client.TeamCityApiClient
 import com.teamcity.report.client.dto.Build
 import com.teamcity.report.client.dto.Project
 import com.teamcity.report.converters.toJobParameters
@@ -54,9 +53,6 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
 
     @Autowired
     lateinit var serversConfig: TeamCityConfig
-
-    @Autowired
-    lateinit var client: TeamCityApiClient
 
     @Autowired
     lateinit var indexerJobsCoordinatorService: IndexerJobsCoordinatorService

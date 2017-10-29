@@ -1,14 +1,16 @@
 package com.teamcity.report.batch
 
-import com.teamcity.report.client.TeamCityApiClient
+import org.slf4j.LoggerFactory
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.launch.JobOperator
+import org.springframework.batch.core.launch.NoSuchJobException
 import org.springframework.batch.core.listener.JobExecutionListenerSupport
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
+import javax.annotation.PreDestroy
 
 
 /**
@@ -18,17 +20,29 @@ import java.util.concurrent.ConcurrentHashMap
 @Service
 @EnableBatchProcessing
 class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
-    @Autowired
-    lateinit var client: TeamCityApiClient
 
     @Autowired
     lateinit var jobOperator: JobOperator
 
-    var terminatedIndexerJobsExecutions = ConcurrentHashMap<String, Long>()
+    private val logger = LoggerFactory.getLogger(IndexerJobsCoordinatorService::class.java)
 
-    fun forceTerminateIndexerJob(jobName: String) = {
-        jobOperator.getRunningExecutions(jobName).forEach { jobExecutionId ->
-            jobOperator.stop(jobExecutionId)
+    private var terminatedIndexerJobsExecutions = ConcurrentHashMap<String, Long>()
+
+    @Volatile
+    private var isShuttingDown = false
+
+    @Synchronized
+    fun terminateIndexerJobs() {
+        logger.info("Stoping all indexer jobs if any...")
+        isShuttingDown = true
+        jobOperator.jobNames.forEach { jobName ->
+            jobOperator.getRunningExecutionsSafe(jobName).forEach { jobExecutionId ->
+                jobOperator.stopSafe(jobExecutionId)
+            }
+            //wait for jobs to stopped gracefully
+            while (jobOperator.getRunningExecutionsSafe(jobName).isNotEmpty()) {
+                Thread.sleep(100)
+            }
         }
     }
 
@@ -38,20 +52,38 @@ class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
         terminatedIndexerJobsExecutions.put(jobName, jobExecution.id)
     }
 
+    @PreDestroy
+    fun shutdown() {
+        terminateIndexerJobs()
+    }
 
     @Scheduled(fixedRate = 5000) //TODO make configurable
     fun checkForActualizationIndexerRestart() {
+        if (isShuttingDown) return
         terminatedIndexerJobsExecutions.forEach { (jobName, executionId) ->
-            if (jobOperator.getRunningExecutions(jobName).isEmpty()) {
-//                val lastJobExecution = jobRepository.getLastJobExecution(jobName, JobParameters())
-//                if (lastJobExecution == null)
-//                    jobOperator.start(jobName, "")
-//                else
-//                jobOperator.restart(executionId)
+            if (jobOperator.getRunningExecutionsSafe(jobName).isEmpty()) {
                 terminatedIndexerJobsExecutions.remove(jobName)
-                jobOperator.startNextInstance(jobName)
+                jobOperator.startNextInstanceSafe(jobName)
             }
         }
+    }
+
+    private fun JobOperator.getRunningExecutionsSafe(jobName: String) = try {
+        getRunningExecutions(jobName)
+    } catch (e: NoSuchJobException) {
+        emptyList<Long>()
+    }
+
+    private fun JobOperator.startNextInstanceSafe(jobName: String) = try {
+        startNextInstance(jobName)
+    } catch (e: NoSuchJobException) {
+        -1L
+    }
+
+    private fun JobOperator.stopSafe(executionId: Long) = try {
+        stop(executionId)
+    } catch (e: NoSuchJobException) {
+        false
     }
 
 }

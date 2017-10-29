@@ -9,7 +9,6 @@ import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemReader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.retry.backoff.ThreadWaitSleeper
 import org.springframework.stereotype.Component
 
 /**
@@ -68,7 +67,11 @@ class ProjectsActualizationIndexerReader(
         }
     }
 
-    private fun pauseAfterRead(requestTimeoutMs: Long) = ThreadWaitSleeper().sleep(requestTimeoutMs)
+    private fun pauseAfterRead(requestTimeoutMs: Long) = try {
+        Thread.sleep(requestTimeoutMs)
+    } catch (e: InterruptedException) {
+        logger.warn("Indexer reader sleep interrupted")
+    }
 
     private fun isLastChunk(projects: Projects) = projects.nextHref == null
 }

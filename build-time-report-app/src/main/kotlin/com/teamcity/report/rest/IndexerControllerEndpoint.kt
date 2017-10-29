@@ -1,13 +1,14 @@
 package com.teamcity.report.rest
 
-import org.springframework.batch.core.JobParameters
-import org.springframework.batch.core.launch.JobOperator
-import org.springframework.batch.core.repository.JobRepository
+import com.teamcity.report.batch.IndexerJobsCoordinatorService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.ExitCodeGenerator
+import org.springframework.boot.SpringApplication
+import org.springframework.context.ApplicationContext
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.concurrent.thread
 
 /**
  * @author Dmitry Zhuravlev
@@ -15,13 +16,27 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 class IndexerControllerEndpoint {
-    @Autowired
-    lateinit var jobOperator: JobOperator
+//    @Autowired
+//    lateinit var jobOperator: JobOperator
+
+//    @Autowired
+//    lateinit var jobRepository: JobRepository
 
     @Autowired
-    lateinit var jobRepository: JobRepository
+    lateinit var appContext: ApplicationContext
 
-    @RequestMapping(value = "startJob", method = arrayOf(RequestMethod.GET))
+    @Autowired
+    lateinit var indexerJobsCoordinatorService: IndexerJobsCoordinatorService
+
+    @RequestMapping(value = "shutdown", method = arrayOf(RequestMethod.GET))
+    fun shutdown() {
+        indexerJobsCoordinatorService.terminateIndexerJobs()
+        thread(start = true) {
+            SpringApplication.exit(appContext, ExitCodeGenerator { 0 })
+        }
+    }
+
+    /*@RequestMapping(value = "startJob", method = arrayOf(RequestMethod.GET))
     fun startJob(@RequestParam("name") name: String) {
         val lastJobExecution = jobRepository.getLastJobExecution(name, JobParameters())
         if (lastJobExecution == null)
@@ -36,5 +51,5 @@ class IndexerControllerEndpoint {
         if (lastJobExecution != null && lastJobExecution.isRunning) {
             jobOperator.stop(lastJobExecution.id)
         }
-    }
+    }*/
 }
