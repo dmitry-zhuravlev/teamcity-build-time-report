@@ -52,6 +52,7 @@ class ReportView : VerticalLayout(), View {
         caption = "From"
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now().minusDays(5)
+        isTextFieldEnabled = false
         fromDateTimeField = this
     }
 
@@ -59,6 +60,7 @@ class ReportView : VerticalLayout(), View {
         caption = "To"
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now()
+        isTextFieldEnabled = false
         toDateTimeField = this
     }
 
@@ -85,11 +87,12 @@ class ReportView : VerticalLayout(), View {
     private fun treeGrid() = TreeGrid<ReportTableNode>().apply {
         setSizeFull()
         addColumn(ReportTableNode::name).caption = "Project/Configuration Name"
-        addColumn { reportTableNode -> durationRepresentation(reportTableNode.calculateDuration()) }.caption = "Duration"
+        addColumn { reportTableNode -> durationRepresentation(reportTableNode.duration) }.caption = "Duration"
+        addColumn { reportTableNode -> percentageDurationRepresentation(reportTableNode.durationPercentage) }.caption = "%"
         treeGrid = this
     }
 
-    fun durationRepresentation(duration: Long): String {
+    private fun durationRepresentation(duration: Long): String {
         val second = TimeUnit.MILLISECONDS.toSeconds(duration)
         val minute = TimeUnit.MILLISECONDS.toMinutes(duration)
         return if (minute > 0) minute.toString() + " min " else "" +
@@ -97,12 +100,17 @@ class ReportView : VerticalLayout(), View {
                         if (minute < 0 && second < 0) second.toString() + " millis" else "0"
     }
 
+    private fun percentageDurationRepresentation(duration: Long): String {
+        return "$duration%"
+    }
+
     private fun refreshTreeGridItems() {
-        val beforeFinishDate = toDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val afterFinishDate = fromDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val beforeFinishDate = toDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val serverName = serverNamesComboBox.value
         val reportItems = reportTableModelLoader.loadReportModel(serverName, beforeFinishDate, afterFinishDate, 0, 100)//TODO remove hardcoded params
         treeGrid.setItems(reportItems, ReportTableNode::childrens)
+        treeGrid.dataProvider.refreshAll()
         treeGrid.expand(reportItems)
     }
 }

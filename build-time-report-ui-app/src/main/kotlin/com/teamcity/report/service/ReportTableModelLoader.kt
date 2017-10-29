@@ -55,9 +55,11 @@ class ReportTableModelLoader {
             val possibleParent = result[item.parentId]
             possibleParent?.childrens?.add(item)
         }
-
-        return listOf(ReportTableNode("_RootTotal", "Total", 0,
-                childrens = result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toMutableList()))
+        return listOf(ReportTableNode("_RootTotal", "Total",
+                childrens = result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toMutableList()).apply {
+            duration = calculateDuration()
+            durationPercentage = calculatePercentageDuration(duration)
+        })
     }
 
     private fun BuildTypeEntity.toTableNode() = ReportTableNode(key.buildTypeId, buildTypeName)
