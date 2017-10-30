@@ -1,7 +1,7 @@
 package com.teamcity.report.indexer.batch.processor
 
-import com.teamcity.report.indexer.client.dto.Project
-import com.teamcity.report.indexer.client.dto.ROOT_PARENT_PROJECT_ID
+import com.teamcity.report.indexer.client.model.Project
+import com.teamcity.report.indexer.client.model.ROOT_PARENT_PROJECT_ID
 import com.teamcity.report.indexer.converters.toEntity
 import com.teamcity.report.repository.entity.ProjectEntity
 import org.springframework.batch.core.configuration.annotation.StepScope

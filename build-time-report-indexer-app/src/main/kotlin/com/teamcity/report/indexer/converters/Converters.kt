@@ -1,7 +1,7 @@
 package com.teamcity.report.indexer.converters
 
-import com.teamcity.report.indexer.client.dto.Build
-import com.teamcity.report.indexer.client.dto.Project
+import com.teamcity.report.indexer.client.model.Build
+import com.teamcity.report.indexer.client.model.Project
 import com.teamcity.report.indexer.config.TeamCityConfig
 import com.teamcity.report.repository.entity.*
 import org.springframework.batch.core.JobParametersBuilder
@@ -13,8 +13,7 @@ import java.time.ZonedDateTime
  */
 
 fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id, buildType.projectId, finishDate.toMilli(), id, serverName),
-        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLongSafe()/*?.let { TimeUnit.MILLISECONDS.toSeconds(it) }*/ ?: 0
-)
+        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLongSafe() ?: 0)
 
 fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, buildType.projectId, buildType.id), buildType.name)
 

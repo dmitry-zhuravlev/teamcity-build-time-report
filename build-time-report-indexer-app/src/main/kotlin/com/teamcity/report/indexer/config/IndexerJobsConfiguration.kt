@@ -8,8 +8,8 @@ import com.teamcity.report.indexer.batch.reader.BuildsIndexerReader
 import com.teamcity.report.indexer.batch.reader.ProjectsActualizationIndexerReader
 import com.teamcity.report.indexer.batch.writer.BuildsIndexerWriter
 import com.teamcity.report.indexer.batch.writer.ProjectsIndexerWriter
-import com.teamcity.report.indexer.client.dto.Build
-import com.teamcity.report.indexer.client.dto.Project
+import com.teamcity.report.indexer.client.model.Build
+import com.teamcity.report.indexer.client.model.Project
 import com.teamcity.report.indexer.converters.toJobParameters
 import com.teamcity.report.repository.ServerRepository
 import com.teamcity.report.repository.entity.BuildEntity

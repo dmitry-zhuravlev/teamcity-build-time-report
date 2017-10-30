@@ -27,19 +27,13 @@ class ReportTableModelLoader {
     @Autowired
     lateinit var projectRepository: PageableProjectRepository
 
-    fun count(serverName: String): Int {
-        val projectsCount = projectRepository.count(serverName)
-        val buildTypesCount = buildTypeRepository.count(serverName)
-        return Math.max(projectsCount, buildTypesCount)
-    }
-
     fun loadReportModel(serverName: String, beforeFinishDate: Long, afterFinishDate: Long, page: Int, size: Int): List<ReportTableNode> {
         val projectsByIdMap = projectRepository.getProjects(serverName, page, size)
                 .map { project -> project.key.id to project }.toMap()
         val buildTypesByIdMap = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectsByIdMap.keys.toList(), serverName, page, size)
                 .map { buildType -> (buildType.key.buildTypeId) to buildType }.toMap()
 
-        val result = mutableMapOf<String, ReportTableNode>()
+        val result = hashMapOf<String, ReportTableNode>()
 
         projectsByIdMap.values.forEach { project ->
             result[project.key.id] = project.toTableNode().apply { parentId = project.key.parentProjectId }

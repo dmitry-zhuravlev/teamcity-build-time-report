@@ -1,6 +1,6 @@
 package com.teamcity.report.indexer.batch.processor
 
-import com.teamcity.report.indexer.client.dto.Build
+import com.teamcity.report.indexer.client.model.Build
 import com.teamcity.report.indexer.converters.toEntity
 import com.teamcity.report.indexer.converters.toTypeEntity
 import com.teamcity.report.repository.entity.BuildEntity

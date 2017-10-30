@@ -1,12 +1,8 @@
 package com.teamcity.report.indexer.batch.reader
 
 import com.teamcity.report.indexer.client.TeamCityApiClient
-import com.teamcity.report.indexer.client.dto.Project
-import com.teamcity.report.indexer.client.dto.Projects
-import com.teamcity.report.indexer.config.TeamCityConfig
-import org.slf4j.LoggerFactory
+import com.teamcity.report.indexer.client.model.Project
 import org.springframework.batch.core.configuration.annotation.StepScope
-import org.springframework.batch.item.ItemReader
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -47,31 +43,9 @@ class ProjectsActualizationIndexerReader(
 
         @Autowired
         private var client: TeamCityApiClient
-) : ItemReader<List<Project>?> {
 
-    private val logger = LoggerFactory.getLogger(ProjectsActualizationIndexerReader::class.java)
+) : AbstractIndexerReader<Project>(requestTimeoutMs, chunkSize, serverName,
+        serverId, serverUrl, initialStart, apiVersion, userName, userPassword) {
 
-    var currentStart = initialStart
-
-    override fun read(): List<Project>? {
-        val serverConfig = TeamCityConfig.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
-        val projects = client.getProjects(chunkSize, currentStart, serverConfig)
-        val projectsList = projects.project
-        logger.info("Got the following projects from server '$serverName' $projectsList")
-        currentStart += chunkSize
-        pauseAfterRead(requestTimeoutMs)
-        return if (isLastChunk(projects) && projectsList.isEmpty()) {
-            null
-        } else {
-            projectsList
-        }
-    }
-
-    private fun pauseAfterRead(requestTimeoutMs: Long) = try {
-        Thread.sleep(requestTimeoutMs)
-    } catch (e: InterruptedException) {
-        logger.warn("Indexer reader sleep interrupted")
-    }
-
-    private fun isLastChunk(projects: Projects) = projects.nextHref == null
+        override fun executeRequest(currentStart: Long) = client.getProjects(chunkSize, currentStart, serverConfig)
 }
