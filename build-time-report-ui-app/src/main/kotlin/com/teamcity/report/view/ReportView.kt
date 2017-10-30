@@ -92,12 +92,22 @@ class ReportView : VerticalLayout(), View {
         treeGrid = this
     }
 
-    private fun durationRepresentation(duration: Long): String {
-        val second = TimeUnit.MILLISECONDS.toSeconds(duration)
-        val minute = TimeUnit.MILLISECONDS.toMinutes(duration)
-        return if (minute > 0) minute.toString() + " min " else "" +
-                if (second > 0) second.toString() + " sec" else "" +
-                        if (minute < 0 && second < 0) second.toString() + " millis" else "0"
+    private fun durationRepresentation(durationMillis: Long): String {
+        val minute = TimeUnit.MILLISECONDS.toMinutes(durationMillis)
+        val second = TimeUnit.MILLISECONDS.toSeconds(durationMillis) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis))
+        val minuteStr = if (minute > 0) {
+            minute.toString() + " min "
+        } else {
+            ""
+        }
+        val minuteAndSecondStr = minuteStr + if (second > 0) {
+            second.toString() + " sec"
+        } else {
+            ""
+        }
+        val millisStr = durationMillis.toString()
+        return if (minuteAndSecondStr.isNotBlank()) minuteAndSecondStr else millisStr
     }
 
     private fun percentageDurationRepresentation(duration: Long): String {
@@ -114,7 +124,6 @@ class ReportView : VerticalLayout(), View {
         treeGrid.expand(reportItems)
     }
 }
-
 
 
 /*fun testReportData() = listOf(
