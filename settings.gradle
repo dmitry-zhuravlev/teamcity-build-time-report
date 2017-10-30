@@ -1,4 +1,4 @@
 include 'build-time-report-common'
-include 'build-time-report-app'
+include 'build-time-report-indexer-app'
 include 'build-time-report-ui-app'
 

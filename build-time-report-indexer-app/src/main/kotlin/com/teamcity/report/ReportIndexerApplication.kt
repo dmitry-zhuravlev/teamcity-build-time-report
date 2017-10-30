@@ -19,9 +19,9 @@ import org.springframework.scheduling.annotation.EnableScheduling
         DataSourceAutoConfiguration::class,
         DataSourceTransactionManagerAutoConfiguration::class,
         HibernateJpaAutoConfiguration::class))
-class ReportApplication
+class ReportIndexerApplication
 
 fun main(args: Array<String>) {
-    SpringApplication.run(ReportApplication::class.java, *args)
+    SpringApplication.run(ReportIndexerApplication::class.java, *args)
 }
 
