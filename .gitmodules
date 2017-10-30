@@ -1,0 +1,3 @@
+[submodule "database/cassandra-cluster"]
+	path = database/cassandra-cluster
+	url = https://github.com/dmitry-zhuravlev/cassandra-cluster.git
