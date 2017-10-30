@@ -26,13 +26,12 @@ class TeamCityApiClientImpl : TeamCityApiClient {
     @Autowired
     lateinit var accessCookieManager: AccessCookieManager
 
-    //TODO make configurable
     private fun buildsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfig.ServerConfig, afterDate: ZonedDateTime?)
-            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/httpAuth/app/rest/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDateQueryParam(afterDate)}")
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/httpAuth/app/rest/${serverConfig.apiVersion}/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDateQueryParam(afterDate)}")
             .build(true).toUri()
 
     private fun projectsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfig.ServerConfig)
-            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/app/rest/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/httpAuth/app/rest/${serverConfig.apiVersion}/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
             .build(true).toUri()
 
     private fun afterDateQueryParam(afterDate: ZonedDateTime?) = if (afterDate == null) "" else ",finishDate:(date:${dateFormat.format(afterDate).replace("+", "%2B")},condition:after)"
