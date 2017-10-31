@@ -11,6 +11,7 @@ import com.teamcity.report.indexer.batch.writer.ProjectsIndexerWriter
 import com.teamcity.report.indexer.client.model.Build
 import com.teamcity.report.indexer.client.model.Project
 import com.teamcity.report.indexer.converters.toJobParameters
+import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import com.teamcity.report.repository.ServerRepository
 import com.teamcity.report.repository.entity.BuildEntity
 import com.teamcity.report.repository.entity.BuildTypeEntity
@@ -18,7 +19,6 @@ import com.teamcity.report.repository.entity.ProjectEntity
 import com.teamcity.report.repository.entity.ServerEntity
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.configuration.JobRegistry
-import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
@@ -31,11 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.task.TaskExecutor
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories
-import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import javax.annotation.PostConstruct
-import javax.sql.DataSource
 
 
 /**
@@ -47,8 +47,8 @@ import javax.sql.DataSource
 @EnableCassandraRepositories("com.teamcity.report.repository")
 @Configuration
 @EnableBatchProcessing
-@EnableAsync
-class IndexerJobsConfiguration : DefaultBatchConfigurer() {
+@EnableScheduling
+class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     @Autowired
     lateinit var jobBuilderFactory: JobBuilderFactory
 
@@ -56,7 +56,7 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
     lateinit var stepBuilderFactory: StepBuilderFactory
 
     @Autowired
-    lateinit var serversConfig: TeamCityConfig
+    lateinit var serversConfig: TeamCityConfigProperties
 
     @Autowired
     lateinit var indexerJobsCoordinatorService: IndexerJobsCoordinatorService
@@ -86,17 +86,16 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
     lateinit var serverRepository: ServerRepository
 
 
-    override fun setDataSource(dataSource: DataSource?) {}
+//    override fun setDataSource(dataSource: DataSource?) {}
 
     @PostConstruct
     fun saveServers() = serversConfig.servers
             .map { server -> ServerEntity(server.name) }
-            .toList()
             .run { serverRepository.saveAll(this) }
 
 
     @Bean
-    fun taskExecutor() = ThreadPoolTaskExecutor().apply {
+    fun taskExecutor(): TaskExecutor = ThreadPoolTaskExecutor().apply {
         corePoolSize = 5    //TODO choose in respect of number of servers
         maxPoolSize = 10
         setQueueCapacity(25)
@@ -151,7 +150,7 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
                         .build()
             }
 
-    private fun buildsActualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
+    private fun buildsActualizationIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("buildsActualizationIndexerStep")
                     .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(buildsActualizationReader)
@@ -160,7 +159,7 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
                     .allowStartIfComplete(true)
                     .build()
 
-    private fun projectsActualizationIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
+    private fun projectsActualizationIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("projectsActualizationIndexerStep")
                     .chunk<List<Project>?, List<ProjectEntity>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(projectsActualizationReader)
@@ -170,7 +169,7 @@ class IndexerJobsConfiguration : DefaultBatchConfigurer() {
                     .build()
 
 
-    private fun buildsIndexerStep(serverConfig: TeamCityConfig.ServerConfig) =
+    private fun buildsIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("buildsIndexerStep")
                     .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.chunkSize.toInt())
                     .reader(buildsIndexerReader)

@@ -2,7 +2,7 @@ package com.teamcity.report.indexer.converters
 
 import com.teamcity.report.indexer.client.model.Build
 import com.teamcity.report.indexer.client.model.Project
-import com.teamcity.report.indexer.config.TeamCityConfig
+import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import com.teamcity.report.repository.entity.*
 import org.springframework.batch.core.JobParametersBuilder
 import java.time.ZonedDateTime
@@ -27,7 +27,7 @@ fun String?.toLongSafe(): Long? = try {
     0
 }
 
-fun TeamCityConfig.toJobParameters() = servers.map { serverConfig ->
+fun TeamCityConfigProperties.toJobParameters() = servers.map { serverConfig ->
     JobParametersBuilder()
             .addLong("actualizationDays", serverConfig.worker.actualizationDays)
             .addLong("start", serverConfig.worker.startPage)

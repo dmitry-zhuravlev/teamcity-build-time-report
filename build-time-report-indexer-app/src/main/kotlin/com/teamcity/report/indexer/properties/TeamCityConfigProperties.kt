@@ -1,4 +1,4 @@
-package com.teamcity.report.indexer.config
+package com.teamcity.report.indexer.properties
 
 import com.teamcity.report.indexer.config.ConfigDefault.WORKER_ACTUALIZATION_DAYS
 import com.teamcity.report.indexer.config.ConfigDefault.WORKER_CHUNK_SIZE
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 @ConfigurationProperties("teamcity")
-data class TeamCityConfig(var servers: List<ServerConfig> = mutableListOf()) {
+data class TeamCityConfigProperties(var servers: List<ServerConfig> = mutableListOf()) {
     data class ServerConfig(var id: String = "", var name: String = "", var apiVersion: String = "", var url: String = "",
                             var username: String = "", var password: String = "", var worker: WorkerConfig = WorkerConfig()) {
         @Component

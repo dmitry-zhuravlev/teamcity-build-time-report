@@ -1,7 +1,7 @@
 package com.teamcity.report.indexer.batch.reader
 
 import com.teamcity.report.indexer.client.model.ElementCollection
-import com.teamcity.report.indexer.config.TeamCityConfig
+import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import org.slf4j.LoggerFactory
 import org.springframework.batch.item.ItemReader
 
@@ -32,7 +32,7 @@ abstract class AbstractIndexerReader<E>(
 ) : ItemReader<List<E>?> {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    val serverConfig = TeamCityConfig.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
+    val serverConfig = TeamCityConfigProperties.ServerConfig(serverId, serverName, apiVersion, serverUrl, userName, userPassword)
 
     private var currentStart = initialStart
 

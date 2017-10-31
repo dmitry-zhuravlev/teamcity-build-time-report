@@ -4,7 +4,7 @@ import com.teamcity.report.indexer.client.model.Builds
 import com.teamcity.report.indexer.client.model.Projects
 import com.teamcity.report.indexer.config.ConfigDefault.WORKER_CHUNK_SIZE
 import com.teamcity.report.indexer.config.ConfigDefault.WORKER_START_PAGE
-import com.teamcity.report.indexer.config.TeamCityConfig
+import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import java.time.ZonedDateTime
 
 /**
@@ -12,6 +12,6 @@ import java.time.ZonedDateTime
  *         Date:  19.10.2017
  */
 interface TeamCityApiClient {
-    fun getBuilds(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfig.ServerConfig, afterDate: ZonedDateTime? = null): Builds
-    fun getProjects(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfig.ServerConfig): Projects
+    fun getBuilds(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime? = null): Builds
+    fun getProjects(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfigProperties.ServerConfig): Projects
 }

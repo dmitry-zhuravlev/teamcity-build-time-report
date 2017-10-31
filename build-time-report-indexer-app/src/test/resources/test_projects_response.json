@@ -1,0 +1,25 @@
+{
+  "count": 4,
+  "project": [
+    {
+      "id": "_Root",
+      "name": "<Root project>",
+      "description": "Contains all other projects"
+    },
+    {
+      "id": "CassandraCluster",
+      "name": "Cassandra Cluster",
+      "parentProjectId": "_Root"
+    },
+    {
+      "id": "DatabasePinger",
+      "name": "Database Pinger",
+      "parentProjectId": "_Root"
+    },
+    {
+      "id": "DatabasePinger_CassandraClusterForDatabasePinger",
+      "name": "Cassandra Cluster For Database Pinger",
+      "parentProjectId": "DatabasePinger"
+    }
+  ]
+}

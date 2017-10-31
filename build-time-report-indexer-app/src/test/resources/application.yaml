@@ -1,0 +1,32 @@
+server:
+  port: 8999
+spring:
+  batch:
+    job:
+      enabled: false
+  data:
+    cassandra:
+      keyspace-name: report_test
+      contact-points: localhost
+
+mock-server:
+     id: TCMock
+     name: Mock TeamCity
+     apiVersion: latest
+     url: http://localhost:8999
+     username: admin
+     password: 123456
+
+teamcity:
+     servers:
+            - id: TCMock
+              name: Mock TeamCity
+              apiVersion: latest
+              url: http://localhost:8999
+              username: admin
+              password: 123456
+              worker:
+                    actualizationDays: 1
+                    chunkSize: 100
+                    requestTimeoutMs: 2000
+                    startPage: 0
