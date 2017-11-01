@@ -3,8 +3,7 @@ package com.teamcity.report.indexer.test.batch.reader
 import com.teamcity.report.indexer.batch.reader.BuildsIndexerReader
 import com.teamcity.report.indexer.batch.reader.ProjectsActualizationIndexerReader
 import com.teamcity.report.indexer.client.TeamCityApiClient
-import com.teamcity.report.indexer.test.config.TestMockServerProperties
-import org.hamcrest.Matchers
+import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import org.hamcrest.Matchers.hasSize
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -24,31 +23,31 @@ class IndexerReaderTest {
     lateinit var teamCityApiClient: TeamCityApiClient
 
     @Autowired
-    lateinit var testMockServerProperties: TestMockServerProperties
+    lateinit var teamCityConfigProperties: TeamCityConfigProperties
 
     @Test
     fun readBuilds() {
         val builds = BuildsIndexerReader(0, 10, 100,
-                serverId = testMockServerProperties.id,
-                serverName = testMockServerProperties.name,
-                serverUrl = testMockServerProperties.url,
-                apiVersion = testMockServerProperties.apiVersion,
-                userName = testMockServerProperties.username,
-                userPassword = testMockServerProperties.password,
+                serverId = teamCityConfigProperties.servers[0].id,
+                serverName = teamCityConfigProperties.servers[0].name,
+                serverUrl = teamCityConfigProperties.servers[0].url,
+                apiVersion = teamCityConfigProperties.servers[0].apiVersion,
+                userName = teamCityConfigProperties.servers[0].username,
+                userPassword = teamCityConfigProperties.servers[0].password,
                 client = teamCityApiClient).read()
         assertThat(builds, hasSize(13))
     }
 
     @Test
     fun readProjects() {
-        val projects = ProjectsActualizationIndexerReader(0, 10, 100,
-                serverId = testMockServerProperties.id,
-                serverName = testMockServerProperties.name,
-                serverUrl = testMockServerProperties.url,
-                apiVersion = testMockServerProperties.apiVersion,
-                userName = testMockServerProperties.username,
-                userPassword = testMockServerProperties.password,
+        val projects = ProjectsActualizationIndexerReader(0, 0, 100,
+                serverId = teamCityConfigProperties.servers[0].id,
+                serverName = teamCityConfigProperties.servers[0].name,
+                serverUrl = teamCityConfigProperties.servers[0].url,
+                apiVersion = teamCityConfigProperties.servers[0].apiVersion,
+                userName = teamCityConfigProperties.servers[0].username,
+                userPassword = teamCityConfigProperties.servers[0].password,
                 client = teamCityApiClient).read()
-        assertThat(projects, Matchers.hasSize(4))
+        assertThat(projects, hasSize(4))
     }
 }

@@ -2,6 +2,15 @@ apply plugin: 'org.springframework.boot'
 
 apply plugin: "io.spring.dependency-management"
 
+test {
+  forkEvery = 1
+
+  if (project.findProperty('run.itest') == null) {
+    logger.lifecycle('Exclude integration tests.')
+    exclude 'com/**/integration/**'
+  }
+}
+
 dependencies {
   compile('com.fasterxml.jackson.module:jackson-module-kotlin:2.8.10')
   compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.10')

@@ -16,7 +16,7 @@ teamcity:
               apiVersion: latest
               url: http://localhost:8111
               username: admin
-              password: 123456 # TODO encrypt
+              password: 123456
               worker:
                     actualizationDays: 1
                     chunkSize: 100

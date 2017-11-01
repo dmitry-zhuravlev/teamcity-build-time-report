@@ -2,8 +2,8 @@ package com.teamcity.report.indexer.client
 
 import com.teamcity.report.indexer.client.model.Builds
 import com.teamcity.report.indexer.client.model.Projects
-import com.teamcity.report.indexer.config.ConfigDefault.WORKER_CHUNK_SIZE
-import com.teamcity.report.indexer.config.ConfigDefault.WORKER_START_PAGE
+import com.teamcity.report.indexer.converters.Constants.WORKER_CHUNK_SIZE
+import com.teamcity.report.indexer.converters.Constants.WORKER_START_PAGE
 import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import java.time.ZonedDateTime
 

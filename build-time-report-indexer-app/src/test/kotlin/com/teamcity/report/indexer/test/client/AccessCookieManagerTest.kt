@@ -3,7 +3,6 @@ package com.teamcity.report.indexer.test.client
 import com.teamcity.report.indexer.client.AccessCookieManager
 import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import com.teamcity.report.indexer.test.client.TestConstants.TEST_ACCESS_COOKIE
-import com.teamcity.report.indexer.test.config.TestMockServerProperties
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -20,26 +19,26 @@ import org.springframework.test.context.junit4.SpringRunner
 class AccessCookieManagerTest {
 
     @Autowired
-    lateinit var testMockServerProperties: TestMockServerProperties
+    lateinit var teamCityConfigProperties: TeamCityConfigProperties
 
     @Test
     fun resolveAccessCookie() = assertEquals(TEST_ACCESS_COOKIE, AccessCookieManager().resolveAccessCookie(
             TeamCityConfigProperties.ServerConfig(
-                    id = testMockServerProperties.id,
-                    name = testMockServerProperties.name,
-                    apiVersion = testMockServerProperties.apiVersion,
-                    url = testMockServerProperties.url,
-                    username = testMockServerProperties.username,
-                    password = testMockServerProperties.password
+                    id = teamCityConfigProperties.servers[0].id,
+                    name = teamCityConfigProperties.servers[0].name,
+                    apiVersion = teamCityConfigProperties.servers[0].apiVersion,
+                    url = teamCityConfigProperties.servers[0].url,
+                    username = teamCityConfigProperties.servers[0].username,
+                    password = teamCityConfigProperties.servers[0].password
             )))
 
     @Test
     fun resolveAccessCookieWithEmptyCredentials() = assertNull(AccessCookieManager().resolveAccessCookie(
             TeamCityConfigProperties.ServerConfig(
-                    id = testMockServerProperties.id,
-                    name = testMockServerProperties.name,
-                    apiVersion = testMockServerProperties.apiVersion,
-                    url = testMockServerProperties.url,
+                    id = teamCityConfigProperties.servers[0].id,
+                    name = teamCityConfigProperties.servers[0].name,
+                    apiVersion = teamCityConfigProperties.servers[0].apiVersion,
+                    url = teamCityConfigProperties.servers[0].url,
                     username = "",
                     password = ""
             )))

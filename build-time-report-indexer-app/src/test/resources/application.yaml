@@ -9,18 +9,10 @@ spring:
       keyspace-name: report_test
       contact-points: localhost
 
-mock-server:
-     id: TCMock
-     name: Mock TeamCity
-     apiVersion: latest
-     url: http://localhost:8999
-     username: admin
-     password: 123456
-
 teamcity:
      servers:
             - id: TCMock
-              name: Mock TeamCity
+              name: Mock TeamCity Server
               apiVersion: latest
               url: http://localhost:8999
               username: admin

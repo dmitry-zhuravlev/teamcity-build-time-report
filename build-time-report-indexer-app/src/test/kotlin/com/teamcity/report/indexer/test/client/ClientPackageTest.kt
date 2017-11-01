@@ -26,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ComponentScan(
         "com.teamcity.report.indexer.client",
+        "com.teamcity.report.indexer.properties",
         "com.teamcity.report.indexer.test.client",
         "com.teamcity.report.indexer.test.mock",
         "com.teamcity.report.indexer.test.config")

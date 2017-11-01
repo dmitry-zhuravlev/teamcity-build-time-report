@@ -1,9 +1,9 @@
 package com.teamcity.report.indexer.properties
 
-import com.teamcity.report.indexer.config.ConfigDefault.WORKER_ACTUALIZATION_DAYS
-import com.teamcity.report.indexer.config.ConfigDefault.WORKER_CHUNK_SIZE
-import com.teamcity.report.indexer.config.ConfigDefault.WORKER_REQUEST_TIMEOUT_MS
-import com.teamcity.report.indexer.config.ConfigDefault.WORKER_START_PAGE
+import com.teamcity.report.indexer.converters.Constants.WORKER_ACTUALIZATION_DAYS
+import com.teamcity.report.indexer.converters.Constants.WORKER_CHUNK_SIZE
+import com.teamcity.report.indexer.converters.Constants.WORKER_REQUEST_TIMEOUT_MS
+import com.teamcity.report.indexer.converters.Constants.WORKER_START_PAGE
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 

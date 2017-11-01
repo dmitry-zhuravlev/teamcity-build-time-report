@@ -2,7 +2,7 @@ package com.teamcity.report.indexer.client
 
 import com.teamcity.report.indexer.client.model.Builds
 import com.teamcity.report.indexer.client.model.Projects
-import com.teamcity.report.indexer.config.ConfigDefault.DATE_PATTERN
+import com.teamcity.report.indexer.converters.Constants.DATE_PATTERN
 import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope

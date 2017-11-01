@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component
 @Component
 @StepScope
 class ProjectsActualizationIndexerReader(
-        @Value("#{jobParameters['requestTimeoutMs']}")
-        private val requestTimeoutMs: Long,
-
         @Value("#{jobParameters['start']}")
         private val initialStart: Long,
+
+        @Value("#{jobParameters['requestTimeoutMs']}")
+        private val requestTimeoutMs: Long,
 
         @Value("#{jobParameters['chunkSize']}")
         private val chunkSize: Long,

@@ -4,7 +4,6 @@
     {
       "id": 13,
       "number": "7",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -24,7 +23,6 @@
     {
       "id": 12,
       "number": "6",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -44,7 +42,6 @@
     {
       "id": 11,
       "number": "5",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -64,7 +61,6 @@
     {
       "id": 10,
       "number": "4",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -84,7 +80,6 @@
     {
       "id": 9,
       "number": "3",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -104,7 +99,6 @@
     {
       "id": 8,
       "number": "2",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -124,7 +118,6 @@
     {
       "id": 7,
       "number": "1",
-      "status": "FAILURE",
       "buildType": {
         "id": "CassandraCluster_Build",
         "name": "Build",
@@ -144,7 +137,6 @@
     {
       "id": 6,
       "number": "5",
-      "status": "SUCCESS",
       "buildType": {
         "id": "DatabasePinger_Build",
         "name": "Build",
@@ -164,7 +156,6 @@
     {
       "id": 5,
       "number": "4",
-      "status": "SUCCESS",
       "buildType": {
         "id": "DatabasePinger_Build",
         "name": "Build",
@@ -184,7 +175,6 @@
     {
       "id": 4,
       "number": "3",
-      "status": "SUCCESS",
       "buildType": {
         "id": "DatabasePinger_Build",
         "name": "Build",
@@ -204,7 +194,6 @@
     {
       "id": 3,
       "number": "1",
-      "status": "FAILURE",
       "buildType": {
         "id": "DatabasePinger_CassandraClusterForDatabasePinger_Build",
         "name": "Build",
@@ -224,7 +213,6 @@
     {
       "id": 2,
       "number": "2",
-      "status": "SUCCESS",
       "buildType": {
         "id": "DatabasePinger_Build",
         "name": "Build",
@@ -244,7 +232,6 @@
     {
       "id": 1,
       "number": "1",
-      "status": "SUCCESS",
       "buildType": {
         "id": "DatabasePinger_Build",
         "name": "Build",

@@ -30,3 +30,39 @@ CREATE TABLE IF NOT EXISTS report.teamcity_build(
       serverName text,
       PRIMARY KEY (serverName)
  );
+
+
+
+
+ CREATE KEYSPACE IF NOT EXISTS report_test WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 2 };
+
+ CREATE TABLE IF NOT EXISTS report_test.teamcity_build(
+       id bigint,
+       buildTypeId text,
+       projectId text,
+       serverName text,
+       buildDuration bigint,
+       finishDate timestamp,
+       PRIMARY KEY (buildTypeId, projectId, serverName, finishDate, id)
+  );
+
+  CREATE TABLE IF NOT EXISTS report_test.teamcity_build_type(
+        buildTypeId text,
+        buildTypeName text,
+        projectId text,
+        serverName text,
+        PRIMARY KEY (serverName, projectId, buildTypeId)
+   );
+
+  CREATE TABLE IF NOT EXISTS report_test.teamcity_project(
+       id text,
+       name text,
+       parentProjectId text,
+       serverName text,
+       PRIMARY KEY (serverName, id, parentProjectId)
+  );
+
+  CREATE TABLE IF NOT EXISTS report_test.teamcity_server(
+       serverName text,
+       PRIMARY KEY (serverName)
+  );

@@ -1,7 +1,7 @@
 package com.teamcity.report.indexer.client.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.teamcity.report.indexer.config.ConfigDefault.DATE_PATTERN
+import com.teamcity.report.indexer.converters.Constants.DATE_PATTERN
 import java.time.ZonedDateTime
 
 /**

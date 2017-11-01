@@ -27,6 +27,7 @@ import org.springframework.context.annotation.ComponentScan
 @ComponentScan("com.teamcity.report.indexer.batch.reader",
         "com.teamcity.report.indexer.test.batch.reader",
         "com.teamcity.report.indexer.client",
+        "com.teamcity.report.indexer.properties",
         "com.teamcity.report.indexer.test.mock",
         "com.teamcity.report.indexer.test.config")
 annotation class ReaderPackageTest
