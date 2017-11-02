@@ -3,6 +3,8 @@ package com.teamcity.report.ui.view
 import com.teamcity.report.ui.model.ReportTableNode
 import com.teamcity.report.ui.service.ReportTableModelLoader
 import com.teamcity.report.ui.service.ServerNamesLoader
+import com.teamcity.report.ui.util.durationRepresentation
+import com.teamcity.report.ui.util.percentageDurationRepresentation
 import com.vaadin.event.ShortcutAction
 import com.vaadin.navigator.View
 import com.vaadin.spring.annotation.SpringView
@@ -11,7 +13,6 @@ import com.vaadin.ui.themes.ValoTheme
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 import javax.annotation.PostConstruct
 
 
@@ -24,6 +25,15 @@ class ReportView : VerticalLayout(), View {
     companion object {
         const val VIEW_NAME = "report"
         const val DATE_FORMAT = "yyyy/MM/dd HH:mmZ"
+
+        const val PROJECT_OR_CONFIG_TABLE_CAPTION = "Project/Configuration Name"
+        const val DURATION_TABLE_CAPTION = "Duration"
+        const val PERCENTAGE_DURATION_TABLE_CAPTION = "%"
+
+        const val FROM_DATE_TIME_FIELD_CAPTION = "From"
+        const val TO_DATE_TIME_FIELD_CAPTION = "To"
+        const val SERVER_NAMES_COMBOBOX_CAPTION = "Server"
+        const val REFRESH_BUTTON_CAPTION = "Refresh"
     }
 
     @Autowired
@@ -49,7 +59,7 @@ class ReportView : VerticalLayout(), View {
     }
 
     private fun fromDateTimeField() = DateTimeField().apply {
-        caption = "From"
+        caption = FROM_DATE_TIME_FIELD_CAPTION
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now().minusDays(5)
         isTextFieldEnabled = false
@@ -57,7 +67,7 @@ class ReportView : VerticalLayout(), View {
     }
 
     private fun toDateTimeField() = DateTimeField().apply {
-        caption = "To"
+        caption = TO_DATE_TIME_FIELD_CAPTION
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now()
         isTextFieldEnabled = false
@@ -65,7 +75,7 @@ class ReportView : VerticalLayout(), View {
     }
 
     private fun serverNamesComboBox() = ComboBox<String>().apply {
-        caption = "Server"
+        caption = SERVER_NAMES_COMBOBOX_CAPTION
         isEmptySelectionAllowed = false
         isTextInputAllowed = true
         val list = serverNamesLoader.loadServerNames().map { serverEntity -> serverEntity.serverName }
@@ -75,7 +85,7 @@ class ReportView : VerticalLayout(), View {
         serverNamesComboBox = this
     }
 
-    private fun refreshButton() = Button("Refresh").apply {
+    private fun refreshButton() = Button(REFRESH_BUTTON_CAPTION).apply {
         setClickShortcut(ShortcutAction.KeyCode.ENTER)
         addStyleName(ValoTheme.BUTTON_PRIMARY)
         setSizeFull()
@@ -86,32 +96,10 @@ class ReportView : VerticalLayout(), View {
 
     private fun treeGrid() = TreeGrid<ReportTableNode>().apply {
         setSizeFull()
-        addColumn(ReportTableNode::name).caption = "Project/Configuration Name"
-        addColumn { reportTableNode -> durationRepresentation(reportTableNode.duration) }.caption = "Duration"
-        addColumn { reportTableNode -> percentageDurationRepresentation(reportTableNode.durationPercentage) }.caption = "%"
+        addColumn(ReportTableNode::name).caption = PROJECT_OR_CONFIG_TABLE_CAPTION
+        addColumn { reportTableNode -> durationRepresentation(reportTableNode.duration) }.caption = DURATION_TABLE_CAPTION
+        addColumn { reportTableNode -> percentageDurationRepresentation(reportTableNode.durationPercentage) }.caption = PERCENTAGE_DURATION_TABLE_CAPTION
         treeGrid = this
-    }
-
-    private fun durationRepresentation(durationMillis: Long): String {
-        val minute = TimeUnit.MILLISECONDS.toMinutes(durationMillis)
-        val second = TimeUnit.MILLISECONDS.toSeconds(durationMillis) -
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis))
-        val minuteStr = if (minute > 0) {
-            minute.toString() + " min "
-        } else {
-            ""
-        }
-        val minuteAndSecondStr = minuteStr + if (second > 0) {
-            second.toString() + " sec"
-        } else {
-            ""
-        }
-        val millisStr = durationMillis.toString()
-        return if (minuteAndSecondStr.isNotBlank()) minuteAndSecondStr else millisStr
-    }
-
-    private fun percentageDurationRepresentation(duration: Long): String {
-        return "$duration%"
     }
 
     private fun refreshTreeGridItems() {
@@ -124,16 +112,3 @@ class ReportView : VerticalLayout(), View {
         treeGrid.expand(reportItems)
     }
 }
-
-
-/*fun testReportData() = listOf(
-        ProjectOrBuild("Test Project1", childrens = listOf(
-                ProjectOrBuild("Test Sub project1", 1L),
-                ProjectOrBuild("Test Sub project2", 2L, childrens = listOf(
-                        ProjectOrBuild("Test Sub Sub project1", 2),
-                        ProjectOrBuild("Test Sub Sub project2", 2)
-                )),
-                ProjectOrBuild("Test Sub project3", 3L),
-                ProjectOrBuild("Test Sub project4", 4L))),
-        ProjectOrBuild("Test Project2", 5L)
-) */
