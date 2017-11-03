@@ -20,5 +20,6 @@ teamcity:
               worker:
                     actualizationDays: 1
                     chunkSize: 100
+                    commitInterval: 1
                     requestTimeoutMs: 2000
                     startPage: 0

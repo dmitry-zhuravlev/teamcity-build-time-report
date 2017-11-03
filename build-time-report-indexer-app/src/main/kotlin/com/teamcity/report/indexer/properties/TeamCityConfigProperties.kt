@@ -2,6 +2,7 @@ package com.teamcity.report.indexer.properties
 
 import com.teamcity.report.indexer.converters.Constants.WORKER_ACTUALIZATION_DAYS
 import com.teamcity.report.indexer.converters.Constants.WORKER_CHUNK_SIZE
+import com.teamcity.report.indexer.converters.Constants.WORKER_COMMIT_INTERVAL
 import com.teamcity.report.indexer.converters.Constants.WORKER_REQUEST_TIMEOUT_MS
 import com.teamcity.report.indexer.converters.Constants.WORKER_START_PAGE
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -20,6 +21,7 @@ data class TeamCityConfigProperties(var servers: List<ServerConfig> = mutableLis
         @ConfigurationProperties("worker")
         data class WorkerConfig(var requestTimeoutMs: Long = WORKER_REQUEST_TIMEOUT_MS,
                                 var chunkSize: Long = WORKER_CHUNK_SIZE,
+                                var commitInterval: Int = WORKER_COMMIT_INTERVAL,
                                 var startPage: Long = WORKER_START_PAGE,
                                 var actualizationDays: Long = WORKER_ACTUALIZATION_DAYS)
     }

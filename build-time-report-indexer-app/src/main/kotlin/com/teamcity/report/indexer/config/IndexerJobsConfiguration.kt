@@ -152,7 +152,7 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun buildsActualizationIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("buildsActualizationIndexerStep")
-                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.chunkSize.toInt())
+                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.commitInterval)
                     .reader(buildsActualizationReader)
                     .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
@@ -161,7 +161,7 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun projectsActualizationIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("projectsActualizationIndexerStep")
-                    .chunk<List<Project>?, List<ProjectEntity>?>(serverConfig.worker.chunkSize.toInt())
+                    .chunk<List<Project>?, List<ProjectEntity>?>(serverConfig.worker.commitInterval)
                     .reader(projectsActualizationReader)
                     .processor(projectsIndexerProcessor)
                     .writer(projectsIndexerWriter)
@@ -171,7 +171,7 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
 
     private fun buildsIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("buildsIndexerStep")
-                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.chunkSize.toInt())
+                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.commitInterval)
                     .reader(buildsIndexerReader)
                     .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
