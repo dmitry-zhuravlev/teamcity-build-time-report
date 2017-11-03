@@ -62,6 +62,9 @@ class ReportView : VerticalLayout(), View {
         caption = FROM_DATE_TIME_FIELD_CAPTION
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now().minusDays(5)
+        addValueChangeListener {
+            refreshTreeGridItems()
+        }
         isTextFieldEnabled = false
         fromDateTimeField = this
     }
@@ -70,6 +73,9 @@ class ReportView : VerticalLayout(), View {
         caption = TO_DATE_TIME_FIELD_CAPTION
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now()
+        addValueChangeListener {
+            refreshTreeGridItems()
+        }
         isTextFieldEnabled = false
         toDateTimeField = this
     }
@@ -81,6 +87,9 @@ class ReportView : VerticalLayout(), View {
         val list = serverNamesLoader.loadServerNames().map { serverEntity -> serverEntity.serverName }
         setItems(list)
         if (list.isNotEmpty()) setSelectedItem(list[0])
+        addSelectionListener {
+            refreshTreeGridItems()
+        }
         isSpacing = true
         serverNamesComboBox = this
     }
