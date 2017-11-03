@@ -19,3 +19,15 @@ dependencyManagement {
 		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
 	}
 }
+
+task zipDistribution(type: Zip, dependsOn: bootJar) {
+	group 'build'
+	description 'Create zip distribution'
+	from('build/libs') {
+		into('files')
+		include '*.jar'
+	}
+	from 'docker'
+}
+
+build.dependsOn(zipDistribution)
