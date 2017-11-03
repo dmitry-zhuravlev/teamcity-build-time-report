@@ -1,25 +1,26 @@
 server:
-  port: 8222
+  port: ${indexer.app.server.port:8080}
 spring:
   batch:
     job:
       enabled: false
   data:
     cassandra:
-      keyspace-name: report
-      contact-points: localhost
+      keyspace-name: ${cassandra.keyspace:report}
+      contact-points: ${cassandra.host}
+      port: ${cassandra.port:9042}
 
 teamcity:
      servers:
-            - id: LocalTC
-              name: Local TeamCity
-              apiVersion: latest
-              url: http://localhost:8111
-              username: admin
-              password: 123456
+            - id: ${teamcity.server.id}
+              name: ${teamcity.server.name}
+              apiVersion: ${teamcity.server.apiVersion:latest}
+              url: ${teamcity.server.url}
+              username: ${teamcity.server.username:}
+              password: ${teamcity.server.password:}
               worker:
-                    actualizationDays: 1
-                    chunkSize: 100
-                    commitInterval: 1
-                    requestTimeoutMs: 2000
-                    startPage: 0
+                    actualizationDays: ${teamcity.server.actualizationDays:1}
+                    chunkSize: ${teamcity.server.chunkSize:100}
+                    commitInterval: ${teamcity.server.commitInterval:1}
+                    requestTimeoutMs: ${teamcity.server.requestTimeoutMs:10000}
+                    startPage: ${teamcity.server.startPage:0}

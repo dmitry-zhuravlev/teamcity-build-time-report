@@ -1,10 +1,11 @@
 server:
-  port: 8223
+  port: ${ui.app.server.port:8080}
 spring:
  data:
      cassandra:
-       keyspace-name: report
-       contact-points: localhost
+       keyspace-name: ${cassandra.keyspace:report}
+       contact-points: ${cassandra.host}
+       port: ${cassandra.port:9042}
 vaadin:
   servlet:
-    production-mode: false
+    production-mode: ${vaadin.production.mode:true}
