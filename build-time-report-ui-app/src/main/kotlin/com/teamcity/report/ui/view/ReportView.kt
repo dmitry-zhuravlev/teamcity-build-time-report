@@ -114,7 +114,7 @@ class ReportView : VerticalLayout(), View {
     private fun refreshTreeGridItems() {
         val afterFinishDate = fromDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val beforeFinishDate = toDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val serverName = serverNamesComboBox.value
+        val serverName = serverNamesComboBox.value ?: return
         val reportItems = reportTableModelLoader.loadReportModel(serverName, beforeFinishDate, afterFinishDate, 0, 1000)//TODO remove hardcoded params
         treeGrid.setItems(reportItems, ReportTableNode::childrens)
         treeGrid.dataProvider.refreshAll()

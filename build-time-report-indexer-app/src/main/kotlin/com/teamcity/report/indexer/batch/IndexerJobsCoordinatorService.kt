@@ -60,7 +60,7 @@ class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
     @Scheduled(fixedRate = 5000) //TODO make configurable
     fun checkForActualizationIndexerRestart() {
         if (isShuttingDown) return
-        terminatedIndexerJobsExecutions.forEach { (jobName, executionId) ->
+        terminatedIndexerJobsExecutions.forEach { (jobName, _) ->
             if (jobOperator.getRunningExecutionsSafe(jobName).isEmpty()) {
                 terminatedIndexerJobsExecutions.remove(jobName)
                 jobOperator.startNextInstanceSafe(jobName)

@@ -9,6 +9,8 @@ spring:
       keyspace-name: ${cassandra.keyspace:report}
       contact-points: ${cassandra.host}
       port: ${cassandra.port:9042}
+      username: ${cassandra.username:}
+      password: ${cassandra.password:}
 
 teamcity:
      servers:

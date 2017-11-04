@@ -6,6 +6,8 @@ spring:
        keyspace-name: ${cassandra.keyspace:report}
        contact-points: ${cassandra.host}
        port: ${cassandra.port:9042}
+       username: ${cassandra.username:}
+       password: ${cassandra.password:}
 vaadin:
   servlet:
     production-mode: ${vaadin.production.mode:true}
