@@ -1,3 +1,6 @@
+logging:
+  level:
+    root: ${logging.level:warn}
 server:
   port: ${ui.app.server.port:8080}
 spring:
