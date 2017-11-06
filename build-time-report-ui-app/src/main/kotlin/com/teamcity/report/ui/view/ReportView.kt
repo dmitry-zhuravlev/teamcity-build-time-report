@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct
 class ReportView : VerticalLayout(), View {
     companion object {
         const val VIEW_NAME = "report"
-        const val DATE_FORMAT = "yyyy/MM/dd HH:mmZ"
+        const val DATE_FORMAT = "yyyy/MM/dd HH:mm"//Z"
 
         const val PROJECT_OR_CONFIG_TABLE_CAPTION = "Project/Configuration Name"
         const val DURATION_TABLE_CAPTION = "Duration"
@@ -56,6 +56,7 @@ class ReportView : VerticalLayout(), View {
         ))
         addComponent(treeGrid())
         setExpandRatio(treeGrid, 1.0f)
+        refreshTreeGridItems()
     }
 
     private fun fromDateTimeField() = DateTimeField().apply {

@@ -4,6 +4,7 @@ import com.teamcity.report.repository.ServerRepository
 import com.vaadin.spring.annotation.SpringComponent
 import com.vaadin.spring.annotation.ViewScope
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.Serializable
 
 /**
  * @author Dmitry Zhuravlev
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 @SpringComponent
 @ViewScope
-class ServerNamesLoader {
+class ServerNamesLoader : Serializable {
     @Autowired
     lateinit var serverRepository: ServerRepository
 

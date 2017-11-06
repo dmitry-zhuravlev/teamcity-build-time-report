@@ -40,7 +40,9 @@ class MainUI : UI(), ViewDisplay {
         }
         root.addComponent(viewDisplay)
         root.setExpandRatio(viewDisplay, 1.0f)
-        navigator.addView("", ReportView::class.java)
+        navigator.addView(AboutView.VIEW_NAME, AboutView::class.java)
+        navigator.addView(ReportView.VIEW_NAME, ReportView::class.java)
+        navigator.navigateTo(ReportView.VIEW_NAME)
     }
 
 

@@ -10,6 +10,7 @@ import com.teamcity.report.ui.model.ReportTableNode
 import com.vaadin.spring.annotation.SpringComponent
 import com.vaadin.spring.annotation.ViewScope
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.Serializable
 
 /**
  * @author Dmitry Zhuravlev
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 @SpringComponent
 @ViewScope
-class ReportTableModelLoader {
+class ReportTableModelLoader : Serializable {
     @Autowired
     lateinit var buildRepository: BuildRepository
 
