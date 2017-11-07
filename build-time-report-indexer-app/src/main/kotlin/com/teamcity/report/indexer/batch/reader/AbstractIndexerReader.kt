@@ -44,7 +44,7 @@ abstract class AbstractIndexerReader<E>(
         logger.info("Got the following data from server '$serverName' $elementList")
         currentStart += chunkSize
         pauseAfterRead(requestTimeoutMs)
-        return if (isLastChunk(elementCollection) && elementList.isEmpty()) {
+        return if (/*isLastChunk(elementCollection) && */elementList.isEmpty()) {
             null
         } else {
             elementList
