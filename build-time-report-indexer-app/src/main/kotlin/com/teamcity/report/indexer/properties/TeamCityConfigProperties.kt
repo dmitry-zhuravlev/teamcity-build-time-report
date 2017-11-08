@@ -26,3 +26,5 @@ data class TeamCityConfigProperties(var servers: List<ServerConfig> = mutableLis
                                 var actualizationDays: Long = WORKER_ACTUALIZATION_DAYS)
     }
 }
+
+fun TeamCityConfigProperties.ServerConfig.isGuestAccess() = username.isBlank()

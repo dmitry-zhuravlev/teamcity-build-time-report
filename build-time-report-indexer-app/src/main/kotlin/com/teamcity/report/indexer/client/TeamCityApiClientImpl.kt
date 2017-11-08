@@ -1,17 +1,20 @@
 package com.teamcity.report.indexer.client
 
+import com.teamcity.report.indexer.client.interceptor.CookieAuthorizationInterceptor
 import com.teamcity.report.indexer.client.model.Builds
 import com.teamcity.report.indexer.client.model.Projects
 import com.teamcity.report.indexer.converters.Constants.DATE_PATTERN
 import com.teamcity.report.indexer.properties.TeamCityConfigProperties
+import com.teamcity.report.indexer.properties.isGuestAccess
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope
-import org.springframework.http.client.support.BasicAuthorizationInterceptor
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestOperations
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import javax.annotation.PostConstruct
 
 /**
  * @author Dmitry Zhuravlev
@@ -23,37 +26,33 @@ class TeamCityApiClientImpl : TeamCityApiClient {
 
     val dateFormat = DateTimeFormatter.ofPattern(DATE_PATTERN)!!
 
+    lateinit var restTemplate: RestOperations
+
     @Autowired
-    lateinit var accessCookieManager: AccessCookieManager
+    lateinit var authorizationInterceptor: CookieAuthorizationInterceptor
 
-    private fun buildsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?)
-            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (isGuestAccess(serverConfig)) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDateQueryParam(afterDate)}")
-            .build(true).toUri()
-
-    private fun projectsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig)
-            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (isGuestAccess(serverConfig)) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
-            .build(true).toUri()
-
-    private fun isGuestAccess(serverConfig: TeamCityConfigProperties.ServerConfig) = serverConfig.username.isBlank()
-
-    private fun afterDateQueryParam(afterDate: ZonedDateTime?) = if (afterDate == null) "" else ",finishDate:(date:${dateFormat.format(afterDate).replace("+", "%2B")},condition:after)"
-
-    private fun prepareRestTemplate(serverConfig: TeamCityConfigProperties.ServerConfig) = RestTemplate().apply {
-        if (!isGuestAccess(serverConfig)) {
-            val accessCookie = accessCookieManager.resolveAccessCookie(serverConfig)
-            if (accessCookie != null) {
-                interceptors.add(CookieAuthorizationInterceptor(accessCookie))
-            } else {
-                interceptors.add(BasicAuthorizationInterceptor(serverConfig.username, serverConfig.password))
-            }
+    @PostConstruct
+    fun init() {
+        restTemplate = RestTemplate().apply {
+            interceptors.add(authorizationInterceptor)
         }
     }
 
-    override fun getBuilds(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?) = with(prepareRestTemplate(serverConfig)) {
+    private fun buildsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?)
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDateQueryParam(afterDate)}")
+            .build(true).toUri()
+
+    private fun projectsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig)
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
+            .build(true).toUri()
+
+    private fun afterDateQueryParam(afterDate: ZonedDateTime?) = if (afterDate == null) "" else ",finishDate:(date:${dateFormat.format(afterDate).replace("+", "%2B")},condition:after)"
+
+    override fun getBuilds(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?) = with(restTemplate) {
         getForEntity(buildsRequestUrl(count, start, serverConfig, afterDate), Builds::class.java).body
     }
 
-    override fun getProjects(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig) = with(prepareRestTemplate(serverConfig)) {
+    override fun getProjects(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig) = with(restTemplate) {
         getForEntity(projectsRequestUrl(count, start, serverConfig), Projects::class.java).body
     }
 }

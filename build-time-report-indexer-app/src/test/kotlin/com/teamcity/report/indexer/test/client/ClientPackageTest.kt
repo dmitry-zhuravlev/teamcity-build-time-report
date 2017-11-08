@@ -1,6 +1,5 @@
 package com.teamcity.report.indexer.test.client
 
-import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.ComponentScan
  * @author Dmitry Zhuravlev
  *         Date:  30.10.2017
  */
-@SpringBootConfiguration
 @EnableAutoConfiguration(exclude = arrayOf(
         DataSourceAutoConfiguration::class,
         DataSourceTransactionManagerAutoConfiguration::class,
@@ -28,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan
         "com.teamcity.report.indexer.client",
         "com.teamcity.report.indexer.properties",
         "com.teamcity.report.indexer.test.client",
+        "com.teamcity.report.indexer.client.interceptor",
         "com.teamcity.report.indexer.test.mock",
         "com.teamcity.report.indexer.test.config")
 annotation class ClientPackageTest

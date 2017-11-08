@@ -17,6 +17,7 @@ import org.springframework.context.annotation.ComponentScan
 @ComponentScan(
         "com.teamcity.report.indexer.batch",
         "com.teamcity.report.indexer.client",
+        "com.teamcity.report.indexer.client.interceptor",
         "com.teamcity.report.indexer.rest",
         "com.teamcity.report.indexer.properties",
         "com.teamcity.report.repository",
