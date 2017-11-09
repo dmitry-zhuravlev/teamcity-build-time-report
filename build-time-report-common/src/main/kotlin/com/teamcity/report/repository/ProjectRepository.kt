@@ -19,6 +19,9 @@ interface ProjectRepository : CassandraRepository<ProjectEntity, ProjectEntityKe
     @Query("select * from report.teamcity_project where serverName=:serverName")
     fun getProjects(@Param("serverName") serverName: String, pageable: Pageable): Slice<ProjectEntity>
 
+    @Query("select * from report.teamcity_project where serverName=:serverName")
+    fun getProjects(@Param("serverName") serverName: String): List<ProjectEntity>
+
     @Query("select count(*) from report.teamcity_project where serverName=:serverName")
     fun count(@Param("serverName") serverName: String): Int
 }
@@ -28,7 +31,10 @@ class PageableProjectRepository {
     @Autowired
     lateinit var projectRepository: ProjectRepository
 
-    fun getProjects(serverName: String, page: Int, size: Int): List<ProjectEntity> {
+    fun getProjects(serverName: String, page: Int?, size: Int?): List<ProjectEntity> {
+        if (page == null || size == null) {
+            return projectRepository.getProjects(serverName)
+        }
         var projectsSlice = projectRepository.getProjects(serverName, CassandraPageRequest.of(0, size))
         for (i in 1..page) {
             if (projectsSlice.hasNext()) {

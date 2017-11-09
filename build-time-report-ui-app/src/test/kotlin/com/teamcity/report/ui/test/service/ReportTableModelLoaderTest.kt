@@ -1,7 +1,7 @@
 package com.teamcity.report.ui.test.service
 
-import com.teamcity.report.repository.entity.BuildTypeEntity
-import com.teamcity.report.repository.entity.BuildTypeEntityKey
+import com.teamcity.report.repository.entity.BuildTypeViewEntity
+import com.teamcity.report.repository.entity.BuildTypeViewEntityKey
 import com.teamcity.report.repository.entity.ProjectEntity
 import com.teamcity.report.repository.entity.ProjectEntityKey
 import com.teamcity.report.ui.model.ReportTableNode
@@ -52,16 +52,16 @@ class ReportTableModelLoaderTest {
     val projects = listOf(
             ProjectEntity(ProjectEntityKey(SERVER1_NAME, PROJECT1_ID), PROJECT1_NAME),
             ProjectEntity(ProjectEntityKey(SERVER1_NAME, PROJECT2_ID), PROJECT2_NAME),
-            ProjectEntity(ProjectEntityKey(SERVER1_NAME, PROJECT3_ID, PROJECT1_ID), PROJECT3_NAME)
+            ProjectEntity(ProjectEntityKey(SERVER1_NAME, PROJECT3_ID), PROJECT3_NAME, PROJECT1_ID)
     )
 
     val buildTypes = listOf(
-            BuildTypeEntity(BuildTypeEntityKey(SERVER1_NAME, PROJECT1_ID, BUILD_TYPE1_PROJECT1_ID), BUILD_TYPE_RELEASE_NAME),
-            BuildTypeEntity(BuildTypeEntityKey(SERVER1_NAME, PROJECT1_ID, BUILD_TYPE2_PROJECT1_ID), BUILD_TYPE_NIGHTLY_NAME),
-            BuildTypeEntity(BuildTypeEntityKey(SERVER1_NAME, PROJECT2_ID, BUILD_TYPE1_PROJECT2_ID), BUILD_TYPE_RELEASE_NAME),
-            BuildTypeEntity(BuildTypeEntityKey(SERVER1_NAME, PROJECT2_ID, BUILD_TYPE2_PROJECT2_ID), BUILD_TYPE_NIGHTLY_NAME),
-            BuildTypeEntity(BuildTypeEntityKey(SERVER1_NAME, PROJECT3_ID, BUILD_TYPE1_PROJECT3_ID), BUILD_TYPE_RELEASE_NAME),
-            BuildTypeEntity(BuildTypeEntityKey(SERVER1_NAME, PROJECT3_ID, BUILD_TYPE2_PROJECT3_ID), BUILD_TYPE_NIGHTLY_NAME)
+            BuildTypeViewEntity(BuildTypeViewEntityKey(SERVER1_NAME, PROJECT1_ID, BUILD_TYPE1_PROJECT1_ID), BUILD_TYPE_RELEASE_NAME),
+            BuildTypeViewEntity(BuildTypeViewEntityKey(SERVER1_NAME, PROJECT1_ID, BUILD_TYPE2_PROJECT1_ID), BUILD_TYPE_NIGHTLY_NAME),
+            BuildTypeViewEntity(BuildTypeViewEntityKey(SERVER1_NAME, PROJECT2_ID, BUILD_TYPE1_PROJECT2_ID), BUILD_TYPE_RELEASE_NAME),
+            BuildTypeViewEntity(BuildTypeViewEntityKey(SERVER1_NAME, PROJECT2_ID, BUILD_TYPE2_PROJECT2_ID), BUILD_TYPE_NIGHTLY_NAME),
+            BuildTypeViewEntity(BuildTypeViewEntityKey(SERVER1_NAME, PROJECT3_ID, BUILD_TYPE1_PROJECT3_ID), BUILD_TYPE_RELEASE_NAME),
+            BuildTypeViewEntity(BuildTypeViewEntityKey(SERVER1_NAME, PROJECT3_ID, BUILD_TYPE2_PROJECT3_ID), BUILD_TYPE_NIGHTLY_NAME)
     )
 
     @Before

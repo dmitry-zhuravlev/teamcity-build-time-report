@@ -20,10 +20,16 @@ class ServicePackageConfiguration {
     fun buildRepository(): BuildRepository = mock(BuildRepository::class.java)
 
     @Bean
-    fun pageableBuildTypeRepository(): PageableBuildTypeRepository = mock(PageableBuildTypeRepository::class.java)
+    fun buildViewRepository(): BuildViewRepository = mock(BuildViewRepository::class.java)
+
+    @Bean
+    fun pageableBuildTypeViewRepository(): PageableBuildTypeViewRepository = mock(PageableBuildTypeViewRepository::class.java)
 
     @Bean
     fun buildTypeRepository(): BuildTypeRepository = mock(BuildTypeRepository::class.java)
+
+    @Bean
+    fun buildTypeViewRepository(): BuildTypeViewRepository = mock(BuildTypeViewRepository::class.java)
 
     @Bean
     fun pageableProjectRepository(): PageableProjectRepository = mock(PageableProjectRepository::class.java)

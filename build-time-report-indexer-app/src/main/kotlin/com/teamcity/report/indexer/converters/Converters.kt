@@ -12,12 +12,12 @@ import java.time.ZonedDateTime
  *         Date: 22/10/2017
  */
 
-fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id, buildType.projectId, finishDate.toMilli(), id, serverName),
-        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLongSafe() ?: 0)
+fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id, finishDate.toMilli(), id, serverName),
+        statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLongSafe() ?: 0, buildType.projectId)
 
-fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, buildType.projectId, buildType.id), buildType.name)
+fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, buildType.id), buildType.name, buildType.projectId)
 
-fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(serverName, id, parentProjectId), name)
+fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(serverName, id), name, parentProjectId)
 
 fun ZonedDateTime.toMilli() = toInstant().toEpochMilli()
 
