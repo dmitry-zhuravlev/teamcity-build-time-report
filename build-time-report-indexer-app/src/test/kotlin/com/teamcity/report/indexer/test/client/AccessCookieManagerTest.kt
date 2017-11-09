@@ -28,14 +28,7 @@ class AccessCookieManagerTest {
 
     @Test
     fun resolveAccessCookie() = assertEquals(TEST_ACCESS_COOKIE, accessCookieManager.resolveAccessCookie(
-            TeamCityConfigProperties.ServerConfig(
-                    id = teamCityConfigProperties.servers[0].id,
-                    name = teamCityConfigProperties.servers[0].name,
-                    apiVersion = teamCityConfigProperties.servers[0].apiVersion,
-                    url = teamCityConfigProperties.servers[0].url,
-                    username = teamCityConfigProperties.servers[0].username,
-                    password = teamCityConfigProperties.servers[0].password
-            )))
+            teamCityConfigProperties.servers[0].id))
 }
 
 @RunWith(SpringRunner::class)
@@ -51,14 +44,7 @@ class AccessCookieManagerEmptyCredentialsTest {
 
     @Test
     fun resolveAccessCookieWithEmptyCredentials() = Assert.assertNull(accessCookieManager.resolveAccessCookie(
-            TeamCityConfigProperties.ServerConfig(
-                    id = teamCityConfigProperties.servers[0].id,
-                    name = teamCityConfigProperties.servers[0].name,
-                    apiVersion = teamCityConfigProperties.servers[0].apiVersion,
-                    url = teamCityConfigProperties.servers[0].url,
-                    username = teamCityConfigProperties.servers[0].username,
-                    password = teamCityConfigProperties.servers[0].password
-            )))
+            teamCityConfigProperties.servers[0].id))
 
 }
 
