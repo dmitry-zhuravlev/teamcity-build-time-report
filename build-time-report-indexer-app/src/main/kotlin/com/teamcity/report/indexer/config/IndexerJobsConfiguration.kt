@@ -48,7 +48,7 @@ import javax.annotation.PostConstruct
 @Configuration
 @EnableBatchProcessing
 @EnableScheduling
-class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
+class IndexerJobsConfiguration {
     @Autowired
     lateinit var jobBuilderFactory: JobBuilderFactory
 
@@ -86,8 +86,6 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
     lateinit var serverRepository: ServerRepository
 
 
-//    override fun setDataSource(dataSource: DataSource?) {}
-
     @PostConstruct
     fun saveServers() = serversConfig.servers
             .map { server -> ServerEntity(server.name) }
@@ -96,7 +94,7 @@ class IndexerJobsConfiguration /*: DefaultBatchConfigurer()*/ {
 
     @Bean
     fun taskExecutor(): TaskExecutor = ThreadPoolTaskExecutor().apply {
-        corePoolSize = 5    //TODO choose in respect of number of servers
+        corePoolSize = 5
         maxPoolSize = 10
         setQueueCapacity(25)
     }

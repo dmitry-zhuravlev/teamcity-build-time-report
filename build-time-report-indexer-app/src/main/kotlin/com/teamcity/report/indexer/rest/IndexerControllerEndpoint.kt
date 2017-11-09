@@ -16,12 +16,6 @@ import kotlin.concurrent.thread
  */
 @RestController
 class IndexerControllerEndpoint {
-//    @Autowired
-//    lateinit var jobOperator: JobOperator
-
-//    @Autowired
-//    lateinit var jobRepository: JobRepository
-
     @Autowired
     lateinit var appContext: ApplicationContext
 
@@ -35,21 +29,4 @@ class IndexerControllerEndpoint {
             SpringApplication.exit(appContext, ExitCodeGenerator { 0 })
         }
     }
-
-    /*@RequestMapping(value = "startJob", method = arrayOf(RequestMethod.GET))
-    fun startJob(@RequestParam("name") name: String) {
-        val lastJobExecution = jobRepository.getLastJobExecution(name, JobParameters())
-        if (lastJobExecution == null)
-            jobOperator.start(name, "")
-        else
-            jobOperator.restart(lastJobExecution.id)
-    }
-
-    @RequestMapping(value = "stopJob", method = arrayOf(RequestMethod.GET))
-    fun stopJob(@RequestParam("name") name: String) {
-        val lastJobExecution = jobRepository.getLastJobExecution(name, JobParameters())
-        if (lastJobExecution != null && lastJobExecution.isRunning) {
-            jobOperator.stop(lastJobExecution.id)
-        }
-    }*/
 }

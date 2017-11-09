@@ -57,7 +57,7 @@ class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
         terminateIndexerJobs()
     }
 
-    @Scheduled(fixedRate = 5000) //TODO make configurable
+    @Scheduled(fixedRate = 5000)
     fun checkForActualizationIndexerRestart() {
         if (isShuttingDown) return
         terminatedIndexerJobsExecutions.forEach { (jobName, _) ->
