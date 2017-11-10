@@ -38,18 +38,18 @@ class TeamCityApiClientImpl : TeamCityApiClient {
         }
     }
 
-    private fun buildsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?)
-            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${afterDateQueryParam(afterDate)}")
+    private fun buildsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?, condition: String?)
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/builds?affectedProject:(id:_Root)=&fields=count,nextHref,build(id,number,status,finishDate,buildType(id,name,projectId),statistics(\$locator(name:BuildDuration),property(name,value)))&locator=count:$count,start:$start${finishDateQueryParam(afterDate, condition)}")
             .build(true).toUri()
 
     private fun projectsRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig)
             = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
             .build(true).toUri()
 
-    private fun afterDateQueryParam(afterDate: ZonedDateTime?) = if (afterDate == null) "" else ",finishDate:(date:${dateFormat.format(afterDate).replace("+", "%2B")},condition:after)"
+    private fun finishDateQueryParam(finishDate: ZonedDateTime?, condition: String?) = if (finishDate == null) "" else ",finishDate:(date:${dateFormat.format(finishDate).replace("+", "%2B")},condition:$condition)"
 
-    override fun getBuilds(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime?) = with(restTemplate) {
-        getForEntity(buildsRequestUrl(count, start, serverConfig, afterDate), Builds::class.java).body
+    override fun getBuilds(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, buildFinishDate: ZonedDateTime?, buildFinishDateCondition: String?) = with(restTemplate) {
+        getForEntity(buildsRequestUrl(count, start, serverConfig, buildFinishDate, buildFinishDateCondition), Builds::class.java).body
     }
 
     override fun getProjects(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig) = with(restTemplate) {

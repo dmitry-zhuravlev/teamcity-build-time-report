@@ -54,7 +54,7 @@ class BuildsActualizationIndexerReader(
 
     override fun executeRequest(currentStart: Long): ElementCollection<Build> {
         val afterDate = ZonedDateTime.now().minusDays(actualizationDays)
-        return client.getBuilds(chunkSize, currentStart, serverConfig, afterDate)
+        return client.getBuilds(chunkSize, currentStart, serverConfig, afterDate, "after")
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import java.time.ZonedDateTime
 
 
 /**
@@ -48,5 +49,7 @@ class BuildsIndexerReader(
 ) : AbstractIndexerReader<Build>(requestTimeoutMs, chunkSize, serverName,
         serverId, serverUrl, initialStart, apiVersion, userName, userPassword) {
 
-        override fun executeRequest(currentStart: Long) = client.getBuilds(chunkSize, currentStart, serverConfig)
+    val buildIndexerStartupDate = ZonedDateTime.now()!!
+
+    override fun executeRequest(currentStart: Long) = client.getBuilds(chunkSize, currentStart, serverConfig, buildIndexerStartupDate, "before")
 }

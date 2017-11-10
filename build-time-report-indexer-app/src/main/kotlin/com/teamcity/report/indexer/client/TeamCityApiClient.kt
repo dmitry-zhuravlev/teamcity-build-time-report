@@ -12,6 +12,7 @@ import java.time.ZonedDateTime
  *         Date:  19.10.2017
  */
 interface TeamCityApiClient {
-    fun getBuilds(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfigProperties.ServerConfig, afterDate: ZonedDateTime? = null): Builds
+    fun getBuilds(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfigProperties.ServerConfig,
+                  buildFinishDate: ZonedDateTime? = null, buildFinishDateCondition: String? = null): Builds
     fun getProjects(count: Long = WORKER_CHUNK_SIZE, start: Long = WORKER_START_PAGE, serverConfig: TeamCityConfigProperties.ServerConfig): Projects
 }
