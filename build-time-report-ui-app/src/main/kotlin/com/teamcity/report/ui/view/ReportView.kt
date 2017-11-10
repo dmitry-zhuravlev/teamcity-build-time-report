@@ -4,6 +4,7 @@ import com.teamcity.report.ui.model.ReportTableNode
 import com.teamcity.report.ui.service.ReportTableModelLoader
 import com.teamcity.report.ui.service.ServerNamesLoader
 import com.teamcity.report.ui.util.durationRepresentation
+import com.teamcity.report.ui.util.isValid
 import com.teamcity.report.ui.util.percentageDurationRepresentation
 import com.vaadin.event.ShortcutAction
 import com.vaadin.navigator.View
@@ -54,9 +55,15 @@ class ReportView : VerticalLayout(), View {
                 FormLayout(fromDateTimeField()), FormLayout(toDateTimeField()), FormLayout(serverNamesComboBox()),
                 FormLayout(refreshButton())
         ))
+        updateDateTimeFieldsRanges(fromDateTimeField.value, toDateTimeField.value)
         addComponent(treeGrid())
         setExpandRatio(treeGrid, 1.0f)
         refreshTreeGridItems()
+    }
+
+    private fun updateDateTimeFieldsRanges(from: LocalDateTime, to: LocalDateTime) {
+        fromDateTimeField.rangeEnd = to
+        toDateTimeField.rangeStart = from
     }
 
     private fun fromDateTimeField() = DateTimeField().apply {
@@ -64,7 +71,10 @@ class ReportView : VerticalLayout(), View {
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now().minusDays(5)
         addValueChangeListener {
-            refreshTreeGridItems()
+            updateDateTimeFieldsRanges(value, toDateTimeField.value)
+            if (isValid()) {
+                refreshTreeGridItems()
+            }
         }
         isTextFieldEnabled = false
         fromDateTimeField = this
@@ -74,8 +84,12 @@ class ReportView : VerticalLayout(), View {
         caption = TO_DATE_TIME_FIELD_CAPTION
         dateFormat = DATE_FORMAT
         value = LocalDateTime.now()
+        rangeStart = fromDateTimeField.value
         addValueChangeListener {
-            refreshTreeGridItems()
+            updateDateTimeFieldsRanges(fromDateTimeField.value, value)
+            if (isValid()) {
+                refreshTreeGridItems()
+            }
         }
         isTextFieldEnabled = false
         toDateTimeField = this
@@ -100,7 +114,9 @@ class ReportView : VerticalLayout(), View {
         addStyleName(ValoTheme.BUTTON_PRIMARY)
         setSizeFull()
         addClickListener {
-            refreshTreeGridItems()
+            if (fromDateTimeField.isValid() && toDateTimeField.isValid()) {
+                refreshTreeGridItems()
+            }
         }
     }
 

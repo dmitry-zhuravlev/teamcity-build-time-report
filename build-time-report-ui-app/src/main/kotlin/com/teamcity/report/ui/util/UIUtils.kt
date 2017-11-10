@@ -1,6 +1,7 @@
 package com.teamcity.report.ui.util
 
 import com.vaadin.ui.Button
+import com.vaadin.ui.DateTimeField
 import com.vaadin.ui.UI
 import com.vaadin.ui.themes.ValoTheme
 import java.util.concurrent.TimeUnit
@@ -9,6 +10,8 @@ import java.util.concurrent.TimeUnit
  * @author Dmitry Zhuravlev
  *         Date:  25.10.2017
  */
+fun DateTimeField.isValid() = errorMessage == null
+
 fun UI.createNavigationButton(caption: String, viewName: String): Button {
     val button = Button(caption)
     button.addStyleName(ValoTheme.BUTTON_SMALL)
