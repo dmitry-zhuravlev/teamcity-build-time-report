@@ -94,9 +94,10 @@ class IndexerJobsConfiguration {
 
     @Bean
     fun taskExecutor(): TaskExecutor = ThreadPoolTaskExecutor().apply {
-        corePoolSize = 5
-        maxPoolSize = 10
-        setQueueCapacity(25)
+        val numberOfServers = serversConfig.servers.size
+        corePoolSize = 5 * numberOfServers
+        maxPoolSize = 10 * numberOfServers
+        setQueueCapacity(25 * numberOfServers)
     }
 
 
