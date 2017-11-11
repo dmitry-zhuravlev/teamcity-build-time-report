@@ -2,6 +2,9 @@ package com.teamcity.report.indexer.test.mock
 
 import com.google.common.io.Files
 import com.teamcity.report.indexer.test.client.TestConstants.TEST_ACCESS_COOKIE
+import com.teamcity.report.indexer.test.constants.TestConstants
+import com.teamcity.report.indexer.test.constants.TestConstants.EMPTY_BUILDS_RESPONSE_FILE_NAME
+import com.teamcity.report.indexer.test.constants.TestConstants.EMPTY_PROJECTS_RESPONSE_FILE_NAME
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -22,6 +25,9 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 class TeamCityServerMockController {
 
+    var buildsResponseFileName = TestConstants.BUILDS_RESPONSE_FILE_NAME
+    var projectsResponseFileName = TestConstants.PROJECTS_RESPONSE_FILE_NAME
+
     @RequestMapping(value = "/app/rest/server", method = arrayOf(RequestMethod.GET))
     fun serverInfo(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
         val body = "MockServer"
@@ -36,8 +42,8 @@ class TeamCityServerMockController {
                request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
         if (isAuthRequest(request)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build<String>()
         response.addHeader(HttpHeaders.SET_COOKIE, TEST_ACCESS_COOKIE)
-        val buildsJSON = Files.toString(ClassPathResource("test_builds_response.json").file, StandardCharsets.UTF_8)
-        val emptyBuildsJSON = Files.toString(ClassPathResource("test_empty_builds_response.json").file, StandardCharsets.UTF_8)
+        val buildsJSON = Files.toString(ClassPathResource(buildsResponseFileName).file, StandardCharsets.UTF_8)
+        val emptyBuildsJSON = Files.toString(ClassPathResource(EMPTY_BUILDS_RESPONSE_FILE_NAME).file, StandardCharsets.UTF_8)
         val parsedLocator = parseLocator(locator)
         val start = parsedLocator["start"]
         if (start == null || start >= 13) {
@@ -52,8 +58,8 @@ class TeamCityServerMockController {
                  request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
         if (isAuthRequest(request)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build<String>()
         response.addHeader(HttpHeaders.SET_COOKIE, TEST_ACCESS_COOKIE)
-        val projectsJSON = Files.toString(ClassPathResource("test_projects_response.json").file, StandardCharsets.UTF_8)
-        val emptyProjectsJSON = Files.toString(ClassPathResource("test_empty_projects_response.json").file, StandardCharsets.UTF_8)
+        val projectsJSON = Files.toString(ClassPathResource(projectsResponseFileName).file, StandardCharsets.UTF_8)
+        val emptyProjectsJSON = Files.toString(ClassPathResource(EMPTY_PROJECTS_RESPONSE_FILE_NAME).file, StandardCharsets.UTF_8)
         val parsedLocator = parseLocator(locator)
         val start = parsedLocator["start"]
         if (start == null || start >= 4) {
