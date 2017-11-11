@@ -4,6 +4,7 @@ import com.google.common.io.Files
 import com.teamcity.report.indexer.test.client.TestConstants.TEST_ACCESS_COOKIE
 import com.teamcity.report.indexer.test.constants.TestConstants
 import com.teamcity.report.indexer.test.constants.TestConstants.EMPTY_BUILDS_RESPONSE_FILE_NAME
+import com.teamcity.report.indexer.test.constants.TestConstants.EMPTY_BUILD_TYPES_RESPONSE_FILE_NAME
 import com.teamcity.report.indexer.test.constants.TestConstants.EMPTY_PROJECTS_RESPONSE_FILE_NAME
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletResponse
 class TeamCityServerMockController {
 
     var buildsResponseFileName = TestConstants.BUILDS_RESPONSE_FILE_NAME
+    var buildTypesResponseFileName = TestConstants.BUILD_TYPES_RESPONSE_FILE_NAME
     var projectsResponseFileName = TestConstants.PROJECTS_RESPONSE_FILE_NAME
 
     @RequestMapping(value = "/app/rest/server", method = arrayOf(RequestMethod.GET))
@@ -50,6 +52,22 @@ class TeamCityServerMockController {
             return ResponseEntity.ok(emptyBuildsJSON)
         }
         return ResponseEntity.ok(buildsJSON)
+    }
+
+    @RequestMapping(value = "/httpAuth/app/rest/latest/buildTypes", method = arrayOf(RequestMethod.GET), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))
+    fun buildTypes(@RequestParam("fields") name: String,
+                   @RequestParam("locator") locator: String,
+                   request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
+        if (isAuthRequest(request)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build<String>()
+        response.addHeader(HttpHeaders.SET_COOKIE, TEST_ACCESS_COOKIE)
+        val buildTypesJSON = Files.toString(ClassPathResource(buildTypesResponseFileName).file, StandardCharsets.UTF_8)
+        val emptyBuildTypesJSON = Files.toString(ClassPathResource(EMPTY_BUILD_TYPES_RESPONSE_FILE_NAME).file, StandardCharsets.UTF_8)
+        val parsedLocator = parseLocator(locator)
+        val start = parsedLocator["start"]
+        if (start == null || start >= 3) {
+            return ResponseEntity.ok(emptyBuildTypesJSON)
+        }
+        return ResponseEntity.ok(buildTypesJSON)
     }
 
     @RequestMapping(value = "/httpAuth/app/rest/latest/projects", method = arrayOf(RequestMethod.GET), produces = arrayOf(MediaType.APPLICATION_JSON_VALUE))

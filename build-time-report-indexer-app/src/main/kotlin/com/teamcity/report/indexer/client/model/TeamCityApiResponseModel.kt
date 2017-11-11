@@ -19,6 +19,8 @@ data class Build(val id: Long, val buildType: BuildType,
                  @JsonFormat(pattern = DATE_PATTERN) val finishDate: ZonedDateTime,
                  val statistics: Statistics)
 
+data class BuildTypes(val count: Long, val buildType: List<BuildType>) : ElementCollection<BuildType>(buildType)
+
 data class BuildType(val id: String, val name: String, val projectId: String)
 
 data class Statistics(val property: List<Property>)

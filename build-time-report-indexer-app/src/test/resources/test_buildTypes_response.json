@@ -1,0 +1,20 @@
+{
+  "count": 3,
+  "buildType": [
+    {
+      "id": "CassandraCluster_Build",
+      "name": "Build",
+      "projectId": "CassandraCluster"
+    },
+    {
+      "id": "DatabasePinger_Build",
+      "name": "Build",
+      "projectId": "DatabasePinger"
+    },
+    {
+      "id": "DatabasePinger_CassandraClusterForDatabasePinger_Build",
+      "name": "Build",
+      "projectId": "DatabasePinger_CassandraClusterForDatabasePinger"
+    }
+  ]
+}

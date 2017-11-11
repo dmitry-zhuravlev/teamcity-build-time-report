@@ -93,7 +93,7 @@ class ReportIndexerAppIntegrationTest {
         assertBuildAndProjects(servers, projects, buildTypes, builds)
 
         //configure mock to simulate project and build configs move
-        teamCityServerMockController.buildsResponseFileName = TestConstants.BUILDS_AFTER_MOVE_RESPONSE_FILE_NAME
+        teamCityServerMockController.buildTypesResponseFileName = TestConstants.BUILD_TYPES_AFTER_MOVE_RESPONSE_FILE_NAME
         teamCityServerMockController.projectsResponseFileName = TestConstants.PROJECTS_AFTER_MOVE_RESPONSE_FILE_NAME
 
         runJobs()
@@ -132,7 +132,7 @@ class ReportIndexerAppIntegrationTest {
     private fun assertBuildsAndProjectsAfterMove(servers: List<ServerEntity>, projects: List<ProjectEntity>,
                                                  buildTypes: List<BuildTypeEntity>, builds: List<BuildEntity>) {
         assertBuildAndProjects(servers, projects, buildTypes, builds)
-        builds.forEach { build -> if (build.key.id == 1L || build.key.id == 2L) assertTrue(build.projectId == "CassandraCluster") }
+        buildTypes.forEach { buildType -> if (buildType.key.buildTypeId == "DatabasePinger_Build") assertTrue(buildType.projectId == "CassandraCluster") }
         projects.forEach { project -> if (project.key.id == "DatabasePinger") assertTrue(project.parentProjectId == "CassandraCluster") }
     }
 }

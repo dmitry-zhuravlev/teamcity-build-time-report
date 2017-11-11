@@ -1,6 +1,7 @@
 package com.teamcity.report.indexer.converters
 
 import com.teamcity.report.indexer.client.model.Build
+import com.teamcity.report.indexer.client.model.BuildType
 import com.teamcity.report.indexer.client.model.Project
 import com.teamcity.report.indexer.properties.TeamCityConfigProperties
 import com.teamcity.report.repository.entity.*
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime
 fun Build.toEntity(serverName: String) = BuildEntity(BuildEntityKey(buildType.id, finishDate.toMilli(), id, serverName),
         statistics.property.firstOrNull { it.name == "BuildDuration" }?.value?.toLongSafe() ?: 0, buildType.projectId)
 
-fun Build.toTypeEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, buildType.id), buildType.name, buildType.projectId)
+fun BuildType.toEntity(serverName: String) = BuildTypeEntity(BuildTypeEntityKey(serverName, id), name, projectId)
 
 fun Project.toEntity(serverName: String) = ProjectEntity(ProjectEntityKey(serverName, id), name, parentProjectId)
 

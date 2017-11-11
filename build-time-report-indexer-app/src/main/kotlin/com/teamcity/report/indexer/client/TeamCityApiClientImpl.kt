@@ -1,6 +1,7 @@
 package com.teamcity.report.indexer.client
 
 import com.teamcity.report.indexer.client.interceptor.CookieAuthorizationInterceptor
+import com.teamcity.report.indexer.client.model.BuildTypes
 import com.teamcity.report.indexer.client.model.Builds
 import com.teamcity.report.indexer.client.model.Projects
 import com.teamcity.report.indexer.converters.Constants.DATE_PATTERN
@@ -46,10 +47,18 @@ class TeamCityApiClientImpl : TeamCityApiClient {
             = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/projects?&fields=count,project(id,name,parentProjectId)&locator=count:$count,start:$start")
             .build(true).toUri()
 
+    private fun buildTypesRequestUrl(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig)
+            = UriComponentsBuilder.fromHttpUrl("${serverConfig.url}/${if (serverConfig.isGuestAccess()) "guestAuth" else "httpAuth"}/app/rest/${serverConfig.apiVersion}/buildTypes?&fields=count,nextHref,buildType(id,name,projectId)&locator=count:$count,start:$start")
+            .build(true).toUri()
+
     private fun finishDateQueryParam(finishDate: ZonedDateTime?, condition: String?) = if (finishDate == null) "" else ",finishDate:(date:${dateFormat.format(finishDate).replace("+", "%2B")},condition:$condition)"
 
     override fun getBuilds(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig, buildFinishDate: ZonedDateTime?, buildFinishDateCondition: String?) = with(restTemplate) {
         getForEntity(buildsRequestUrl(count, start, serverConfig, buildFinishDate, buildFinishDateCondition), Builds::class.java).body
+    }
+
+    override fun getBuildTypes(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig) = with(restTemplate) {
+        getForEntity(buildTypesRequestUrl(count, start, serverConfig), BuildTypes::class.java).body
     }
 
     override fun getProjects(count: Long, start: Long, serverConfig: TeamCityConfigProperties.ServerConfig) = with(restTemplate) {

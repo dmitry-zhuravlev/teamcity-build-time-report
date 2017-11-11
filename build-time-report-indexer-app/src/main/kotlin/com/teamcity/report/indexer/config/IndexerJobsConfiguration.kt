@@ -1,14 +1,18 @@
 package com.teamcity.report.indexer.config
 
 import com.teamcity.report.indexer.batch.IndexerJobsCoordinatorService
+import com.teamcity.report.indexer.batch.processor.BuildTypesIndexerProcessor
 import com.teamcity.report.indexer.batch.processor.BuildsIndexerProcessor
 import com.teamcity.report.indexer.batch.processor.ProjectsIndexerProcessor
+import com.teamcity.report.indexer.batch.reader.BuildTypesActualizationIndexerReader
 import com.teamcity.report.indexer.batch.reader.BuildsActualizationIndexerReader
 import com.teamcity.report.indexer.batch.reader.BuildsIndexerReader
 import com.teamcity.report.indexer.batch.reader.ProjectsActualizationIndexerReader
+import com.teamcity.report.indexer.batch.writer.BuildTypesIndexerWriter
 import com.teamcity.report.indexer.batch.writer.BuildsIndexerWriter
 import com.teamcity.report.indexer.batch.writer.ProjectsIndexerWriter
 import com.teamcity.report.indexer.client.model.Build
+import com.teamcity.report.indexer.client.model.BuildType
 import com.teamcity.report.indexer.client.model.Project
 import com.teamcity.report.indexer.converters.toJobParameters
 import com.teamcity.report.indexer.properties.TeamCityConfigProperties
@@ -65,6 +69,9 @@ class IndexerJobsConfiguration {
     lateinit var buildsActualizationReader: BuildsActualizationIndexerReader
 
     @Autowired
+    lateinit var buildTypesActualizationReader: BuildTypesActualizationIndexerReader
+
+    @Autowired
     lateinit var projectsActualizationReader: ProjectsActualizationIndexerReader
 
     @Autowired
@@ -74,10 +81,16 @@ class IndexerJobsConfiguration {
     lateinit var buildsIndexerWriter: BuildsIndexerWriter
 
     @Autowired
+    lateinit var buildTypesIndexerWriter: BuildTypesIndexerWriter
+
+    @Autowired
     lateinit var projectsIndexerWriter: ProjectsIndexerWriter
 
     @Autowired
     lateinit var buildsIndexerProcessor: BuildsIndexerProcessor
+
+    @Autowired
+    lateinit var buildTypesIndexerProcessor: BuildTypesIndexerProcessor
 
     @Autowired
     lateinit var projectsIndexerProcessor: ProjectsIndexerProcessor
@@ -119,15 +132,15 @@ class IndexerJobsConfiguration {
     }
 
     @Bean
-    fun allJobs() = buildsIndexerJobs() + buildsIndexerActualizationJobs() + projectsIndexerActualizationJobs()
+    fun allJobs() = allBuildsIndexerJobs() + buildsIndexerActualizationJobs() + buildTypesIndexerActualizationJobs() + projectsIndexerActualizationJobs()
 
 
-    private fun buildsIndexerJobs(): List<Job> =
+    private fun allBuildsIndexerJobs(): List<Job> =
             serversConfig.servers.map { serverConfig ->
-                jobBuilderFactory.get("buildsIndexerJob${serverConfig.id}")
+                jobBuilderFactory.get("allBuildsIndexerJob${serverConfig.id}")
                         .incrementer(RunIdIncrementer())
-                        .listener(indexerJobsCoordinatorService)
-                        .start(buildsIndexerStep(serverConfig))
+//                        .listener(indexerJobsCoordinatorService)  //uncomment it to always restart AllBuildsIndexer after it finish its work
+                        .start(allBuildsIndexerStep(serverConfig))
                         .build()
             }
 
@@ -137,6 +150,15 @@ class IndexerJobsConfiguration {
                         .incrementer(RunIdIncrementer())
                         .listener(indexerJobsCoordinatorService)
                         .start(buildsActualizationIndexerStep(serverConfig))
+                        .build()
+            }
+
+    private fun buildTypesIndexerActualizationJobs(): List<Job> =
+            serversConfig.servers.map { serverConfig ->
+                jobBuilderFactory.get("buildTypesIndexerActualizationJob${serverConfig.id}")
+                        .incrementer(RunIdIncrementer())
+                        .listener(indexerJobsCoordinatorService)
+                        .start(buildTypesActualizationIndexerStep(serverConfig))
                         .build()
             }
 
@@ -151,10 +173,19 @@ class IndexerJobsConfiguration {
 
     private fun buildsActualizationIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
             stepBuilderFactory.get("buildsActualizationIndexerStep")
-                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.commitInterval)
+                    .chunk<List<Build>?, List<BuildEntity>?>(serverConfig.worker.commitInterval)
                     .reader(buildsActualizationReader)
                     .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
+                    .allowStartIfComplete(true)
+                    .build()
+
+    private fun buildTypesActualizationIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
+            stepBuilderFactory.get("buildTypesActualizationIndexerStep")
+                    .chunk<List<BuildType>?, List<BuildTypeEntity>?>(serverConfig.worker.commitInterval)
+                    .reader(buildTypesActualizationReader)
+                    .processor(buildTypesIndexerProcessor)
+                    .writer(buildTypesIndexerWriter)
                     .allowStartIfComplete(true)
                     .build()
 
@@ -168,9 +199,9 @@ class IndexerJobsConfiguration {
                     .build()
 
 
-    private fun buildsIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
-            stepBuilderFactory.get("buildsIndexerStep")
-                    .chunk<List<Build>?, List<Pair<BuildTypeEntity, BuildEntity>>?>(serverConfig.worker.commitInterval)
+    private fun allBuildsIndexerStep(serverConfig: TeamCityConfigProperties.ServerConfig) =
+            stepBuilderFactory.get("allBuildsIndexerStep")
+                    .chunk<List<Build>?, List<BuildEntity>?>(serverConfig.worker.commitInterval)
                     .reader(buildsIndexerReader)
                     .processor(buildsIndexerProcessor)
                     .writer(buildsIndexerWriter)
