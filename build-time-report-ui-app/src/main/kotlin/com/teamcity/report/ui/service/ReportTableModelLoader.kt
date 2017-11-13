@@ -37,7 +37,7 @@ class ReportTableModelLoader : Serializable {
         val result = hashMapOf<String, ReportTableNode>()
 
         projectsByIdMap.values.forEach { project ->
-            result[project.key.id] = project.toTableNode().apply { parentId = project.parentProjectId }
+            result[project.key.id] = project.toTableNode()
         }
 
         buildTypesByIdMap.values.forEach { buildType ->
@@ -47,8 +47,7 @@ class ReportTableModelLoader : Serializable {
         }
 
         result.values.forEach { item ->
-            val possibleParent = result[item.parentId]
-            possibleParent?.childrens?.add(item)
+            result[item.parentId]?.childrens?.add(item)
         }
         return listOf(ReportTableNode("_RootTotal", "Total",
                 childrens = result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toMutableList()).apply {
@@ -59,6 +58,6 @@ class ReportTableModelLoader : Serializable {
 
     private fun BuildTypeViewEntity.toTableNode() = ReportTableNode(key.buildTypeId, buildTypeName)
 
-    private fun ProjectEntity.toTableNode() = ReportTableNode(key.id, name)
+    private fun ProjectEntity.toTableNode() = ReportTableNode(key.id, name, parentId = parentProjectId)
 
 }
