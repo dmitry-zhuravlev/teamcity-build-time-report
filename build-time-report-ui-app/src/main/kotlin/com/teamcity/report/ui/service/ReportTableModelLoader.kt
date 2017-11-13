@@ -1,6 +1,6 @@
 package com.teamcity.report.ui.service
 
-import com.teamcity.report.repository.BuildViewRepository
+import com.teamcity.report.repository.BuildRepository
 import com.teamcity.report.repository.PageableBuildTypeViewRepository
 import com.teamcity.report.repository.PageableProjectRepository
 import com.teamcity.report.repository.entity.BuildTypeViewEntity
@@ -20,7 +20,7 @@ import java.io.Serializable
 @ViewScope
 class ReportTableModelLoader : Serializable {
     @Autowired
-    lateinit var buildRepository: BuildViewRepository
+    lateinit var buildRepository: BuildRepository
 
     @Autowired
     lateinit var buildTypeRepository: PageableBuildTypeViewRepository
@@ -42,7 +42,7 @@ class ReportTableModelLoader : Serializable {
 
         buildTypesByIdMap.values.forEach { buildType ->
             val buildTypeNode = buildType.toTableNode()
-            buildTypeNode.duration = buildRepository.sumBuildDurations(buildType.key.buildTypeId, buildType.key.projectId, serverName, beforeFinishDate, afterFinishDate)
+            buildTypeNode.duration = buildRepository.sumBuildDurations(buildType.key.buildTypeId, serverName, beforeFinishDate, afterFinishDate)
             result[buildType.key.projectId]?.childrens?.add(buildTypeNode)
         }
 

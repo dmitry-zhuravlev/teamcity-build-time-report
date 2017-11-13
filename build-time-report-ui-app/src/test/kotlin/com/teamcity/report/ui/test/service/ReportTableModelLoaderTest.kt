@@ -68,12 +68,12 @@ class ReportTableModelLoaderTest {
     fun prepareMocks() {
         `when`(reportTableLoader.projectRepository.getProjects(SERVER1_NAME, 0, 0)).thenReturn(projects)
         `when`(reportTableLoader.buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(listOf(PROJECT1_ID, PROJECT2_ID, PROJECT3_ID), SERVER1_NAME, 0, 0)).thenReturn(buildTypes)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT1_ID, PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(5_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT1_ID, PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(3_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT2_ID, PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(6_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT2_ID, PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(7_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT3_ID, PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(10_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT3_ID, PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(1_000)
+        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(5_000)
+        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(3_000)
+        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(6_000)
+        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(7_000)
+        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(10_000)
+        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(1_000)
     }
 
     @Test

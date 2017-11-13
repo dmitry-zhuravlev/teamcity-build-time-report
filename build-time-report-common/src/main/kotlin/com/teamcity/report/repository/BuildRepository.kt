@@ -12,18 +12,15 @@ import org.springframework.data.repository.query.Param
  * @author Dmitry Zhuravlev
  *         Date:  20.10.2017
  */
-interface BuildViewRepository : CassandraRepository<BuildViewEntity, BuildViewEntityKey> {
-
-    @Query("""SELECT sum(buildDuration) FROM report.teamcity_build_view WHERE
+interface BuildRepository : CassandraRepository<BuildEntity, BuildEntityKey> {
+    @Query("""SELECT sum(buildDuration) FROM report.teamcity_build WHERE
                buildTypeId=:buildTypeId
-               and projectId=:projectId
                and serverName=:serverName
                and finishDate>=:afterFinishDate and finishDate<=:beforeFinishDate""")
     fun sumBuildDurations(@Param("buildTypeId") buildTypeId: String,
-                          @Param("projectId") projectId: String,
                           @Param("serverName") serverName: String,
                           @Param("beforeFinishDate") beforeFinishDate: Long,
                           @Param("afterFinishDate") afterFinishDate: Long): Long
 }
 
-interface BuildRepository : CassandraRepository<BuildEntity, BuildEntityKey>
+interface BuildViewRepository : CassandraRepository<BuildViewEntity, BuildViewEntityKey>
