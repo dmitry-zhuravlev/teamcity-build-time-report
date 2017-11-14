@@ -33,6 +33,7 @@ class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
 
     @Synchronized
     fun terminateIndexerJobs() {
+        if (isShuttingDown) return
         logger.info("Stoping all indexer jobs if any...")
         isShuttingDown = true
         jobOperator.jobNames.forEach { jobName ->
