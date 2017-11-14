@@ -2,7 +2,6 @@ package com.teamcity.report.indexer.batch
 
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.launch.JobOperator
 import org.springframework.batch.core.launch.NoSuchJobException
 import org.springframework.batch.core.listener.JobExecutionListenerSupport
@@ -18,7 +17,6 @@ import javax.annotation.PreDestroy
  *         Date: 21/10/2017
  */
 @Service
-@EnableBatchProcessing
 class IndexerJobsCoordinatorService : JobExecutionListenerSupport() {
 
     @Autowired

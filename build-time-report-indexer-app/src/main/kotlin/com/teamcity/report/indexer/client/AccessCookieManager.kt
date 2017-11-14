@@ -56,12 +56,12 @@ class AccessCookieManager(teamCityConfigProperties: TeamCityConfigProperties) {
         if (storedCookie != null) {
             return storedCookie
         }
-        logger.info("Cannot find cached auth cookie for server ${serverConfig.url + COOKIE_REQUEST_PATH}. Will be requested from server.")
         synchronized(serverConfig) {
             val currentCookie = cookiesMap[serverConfig.id]
             if (currentCookie != null) {
                 return currentCookie
             }
+            logger.info("Cannot find cached auth cookie for server ${serverConfig.url + COOKIE_REQUEST_PATH}. Will be requested from server.")
             val newAccessCookie = requestCookieFromServer(serverConfig)
             if (newAccessCookie != null) {
                 cookiesMap[serverConfig.id] = newAccessCookie
