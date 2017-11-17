@@ -31,6 +31,7 @@ class MainUI : UI(), ViewDisplay {
         val navigationBar = CssLayout().apply {
             addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP)
             addComponent(createNavigationButton("Report", ReportView.VIEW_NAME))
+            addComponent(createNavigationButton("Chart", ChartView.VIEW_NAME))
             addComponent(createNavigationButton("About", AboutView.VIEW_NAME))
         }
         root.addComponent(navigationBar)
@@ -42,6 +43,7 @@ class MainUI : UI(), ViewDisplay {
         root.setExpandRatio(viewDisplay, 1.0f)
         navigator.addView(AboutView.VIEW_NAME, AboutView::class.java)
         navigator.addView(ReportView.VIEW_NAME, ReportView::class.java)
+        navigator.addView(ChartView.VIEW_NAME, ChartView::class.java)
         navigator.navigateTo(ReportView.VIEW_NAME)
     }
 

@@ -8,6 +8,7 @@ apply plugin: "io.spring.dependency-management"
 
 dependencies {
 	compile('com.vaadin:vaadin-spring-boot-starter')
+	compile('com.byteowls:vaadin-chartjs:1.0.0')
 
 	compile project(':build-time-report-common')
 
