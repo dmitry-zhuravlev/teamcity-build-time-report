@@ -20,7 +20,7 @@ class AboutView : VerticalLayout(), View {
 
     @PostConstruct
     fun init() {
-        addComponent(Label("TeamCity Report Application"))
+        addComponent(Label("TeamCity Build Time Report Application"))
     }
 
 }

@@ -4,8 +4,8 @@ import com.teamcity.report.repository.entity.BuildTypeViewEntity
 import com.teamcity.report.repository.entity.BuildTypeViewEntityKey
 import com.teamcity.report.repository.entity.ProjectEntity
 import com.teamcity.report.repository.entity.ProjectEntityKey
-import com.teamcity.report.ui.model.ReportTableNode
-import com.teamcity.report.ui.service.ReportTableModelLoader
+import com.teamcity.report.ui.model.ReportNode
+import com.teamcity.report.ui.service.ReportModelLoader
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -22,10 +22,10 @@ import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
 @ServicePackageTest
-class ReportTableModelLoaderTest {
+class ReportModelLoaderTest {
 
     @Autowired
-    lateinit var reportTableLoader: ReportTableModelLoader
+    lateinit var reportLoader: ReportModelLoader
 
     companion object {
         const val BUILD_TYPE_RELEASE_NAME = "release"
@@ -66,19 +66,19 @@ class ReportTableModelLoaderTest {
 
     @Before
     fun prepareMocks() {
-        `when`(reportTableLoader.projectRepository.getProjects(SERVER1_NAME, 0, 0)).thenReturn(projects)
-        `when`(reportTableLoader.buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(listOf(PROJECT1_ID, PROJECT2_ID, PROJECT3_ID), SERVER1_NAME, 0, 0)).thenReturn(buildTypes)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(5_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(3_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(6_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(7_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(10_000)
-        `when`(reportTableLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(1_000)
+        `when`(reportLoader.projectRepository.getProjects(SERVER1_NAME, 0, 0)).thenReturn(projects)
+        `when`(reportLoader.buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(listOf(PROJECT1_ID, PROJECT2_ID, PROJECT3_ID), SERVER1_NAME, 0, 0)).thenReturn(buildTypes)
+        `when`(reportLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(5_000)
+        `when`(reportLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT1_ID, SERVER1_NAME, 0, 0)).thenReturn(3_000)
+        `when`(reportLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(6_000)
+        `when`(reportLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT2_ID, SERVER1_NAME, 0, 0)).thenReturn(7_000)
+        `when`(reportLoader.buildRepository.sumBuildDurations(BUILD_TYPE1_PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(10_000)
+        `when`(reportLoader.buildRepository.sumBuildDurations(BUILD_TYPE2_PROJECT3_ID, SERVER1_NAME, 0, 0)).thenReturn(1_000)
     }
 
     @Test
     fun loadReportModelCalculations() {
-        val loadReportModel = reportTableLoader.loadReportModel(SERVER1_NAME, 0, 0, 0, 0)
+        val loadReportModel = reportLoader.loadReportModel(SERVER1_NAME, 0, 0, 0, 0)
         assertNotNull(loadReportModel)
         val rootNode = loadReportModel[0]
         assertEquals(32_000, rootNode.duration)
@@ -99,7 +99,7 @@ class ReportTableModelLoaderTest {
         }
     }
 
-    private fun assertPercentage(root: ReportTableNode) {
+    private fun assertPercentage(root: ReportNode) {
         if (root.id == "_RootTotal") {
             assertEquals(100, root.durationPercentage)
         }

@@ -1,7 +1,7 @@
 package com.teamcity.report.ui.view
 
-import com.teamcity.report.ui.model.ReportTableNode
-import com.teamcity.report.ui.service.ReportTableModelLoader
+import com.teamcity.report.ui.model.ReportNode
+import com.teamcity.report.ui.service.ReportModelLoader
 import com.teamcity.report.ui.service.ServerNamesLoader
 import com.teamcity.report.ui.util.durationRepresentation
 import com.teamcity.report.ui.util.isValid
@@ -38,12 +38,12 @@ class ReportView : VerticalLayout(), View {
     }
 
     @Autowired
-    lateinit var reportTableModelLoader: ReportTableModelLoader
+    lateinit var reportModelLoader: ReportModelLoader
 
     @Autowired
     lateinit var serverNamesLoader: ServerNamesLoader
 
-    lateinit var treeGrid: TreeGrid<ReportTableNode>
+    lateinit var treeGrid: TreeGrid<ReportNode>
     lateinit var fromDateTimeField: DateTimeField
     lateinit var toDateTimeField: DateTimeField
     lateinit var serverNamesComboBox: ComboBox<String>
@@ -120,9 +120,9 @@ class ReportView : VerticalLayout(), View {
         }
     }
 
-    private fun treeGrid() = TreeGrid<ReportTableNode>().apply {
+    private fun treeGrid() = TreeGrid<ReportNode>().apply {
         setSizeFull()
-        addColumn(ReportTableNode::name).caption = PROJECT_OR_CONFIG_TABLE_CAPTION
+        addColumn(ReportNode::name).caption = PROJECT_OR_CONFIG_TABLE_CAPTION
         addColumn { reportTableNode -> durationRepresentation(reportTableNode.duration) }.caption = DURATION_TABLE_CAPTION
         addColumn { reportTableNode -> percentageDurationRepresentation(reportTableNode.durationPercentage) }.caption = PERCENTAGE_DURATION_TABLE_CAPTION
         treeGrid = this
@@ -132,8 +132,8 @@ class ReportView : VerticalLayout(), View {
         val afterFinishDate = fromDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val beforeFinishDate = toDateTimeField.value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val serverName = serverNamesComboBox.value ?: return
-        val reportItems = reportTableModelLoader.loadReportModel(serverName, beforeFinishDate, afterFinishDate)
-        treeGrid.setItems(reportItems, ReportTableNode::childrens)
+        val reportItems = reportModelLoader.loadReportModel(serverName, beforeFinishDate, afterFinishDate)
+        treeGrid.setItems(reportItems, ReportNode::childrens)
         treeGrid.dataProvider.refreshAll()
         treeGrid.expand(reportItems)
     }

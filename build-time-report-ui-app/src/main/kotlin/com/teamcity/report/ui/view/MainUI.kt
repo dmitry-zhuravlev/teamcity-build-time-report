@@ -2,6 +2,7 @@ package com.teamcity.report.ui.view
 
 import com.teamcity.report.ui.util.createNavigationButton
 import com.vaadin.annotations.Theme
+import com.vaadin.navigator.Navigator
 import com.vaadin.navigator.View
 import com.vaadin.navigator.ViewDisplay
 import com.vaadin.server.VaadinRequest
@@ -44,7 +45,14 @@ class MainUI : UI(), ViewDisplay {
         navigator.addView(AboutView.VIEW_NAME, AboutView::class.java)
         navigator.addView(ReportView.VIEW_NAME, ReportView::class.java)
         navigator.addView(ChartView.VIEW_NAME, ChartView::class.java)
-        navigator.navigateTo(ReportView.VIEW_NAME)
+
+        // Set default view
+        val stateManager = Navigator.UriFragmentManager(page)
+        if (stateManager.state.isEmpty()) {
+            stateManager.state = ReportView.VIEW_NAME
+        } else {
+            navigator.navigateTo(stateManager.state)
+        }
     }
 
 

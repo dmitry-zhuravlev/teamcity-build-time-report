@@ -7,7 +7,7 @@ import com.teamcity.report.repository.entity.ROOT_PARENT_PROJECT_ID
  * @author Dmitry Zhuravlev
  *         Date:  25.10.2017
  */
-data class ReportTableNode(val id: String, val name: String, var duration: Long = 0, var durationPercentage: Long = 100L, val childrens: MutableList<ReportTableNode> = mutableListOf(), var parentId: String = ROOT_PARENT_PROJECT_ID) {
+data class ReportNode(val id: String, val name: String, var duration: Long = 0, var durationPercentage: Long = 100L, val childrens: MutableList<ReportNode> = mutableListOf(), var parentId: String = ROOT_PARENT_PROJECT_ID) {
 
     fun calculateDuration(): Long =
             if (childrens.isEmpty()) duration

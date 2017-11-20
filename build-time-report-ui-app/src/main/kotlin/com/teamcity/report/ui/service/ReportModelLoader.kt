@@ -6,9 +6,8 @@ import com.teamcity.report.repository.PageableProjectRepository
 import com.teamcity.report.repository.entity.BuildTypeViewEntity
 import com.teamcity.report.repository.entity.ProjectEntity
 import com.teamcity.report.repository.entity.ROOT_PARENT_PROJECT_ID
-import com.teamcity.report.ui.model.ReportTableNode
+import com.teamcity.report.ui.model.ReportNode
 import com.vaadin.spring.annotation.SpringComponent
-import com.vaadin.spring.annotation.ViewScope
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.Serializable
 
@@ -17,8 +16,7 @@ import java.io.Serializable
  *         Date:  26.10.2017
  */
 @SpringComponent
-@ViewScope
-class ReportTableModelLoader : Serializable {
+class ReportModelLoader : Serializable {
     @Autowired
     lateinit var buildRepository: BuildRepository
 
@@ -28,13 +26,13 @@ class ReportTableModelLoader : Serializable {
     @Autowired
     lateinit var projectRepository: PageableProjectRepository
 
-    fun loadReportModel(serverName: String, beforeFinishDate: Long, afterFinishDate: Long, page: Int? = null, size: Int? = null): List<ReportTableNode> {
+    fun loadReportModel(serverName: String, beforeFinishDate: Long, afterFinishDate: Long, page: Int? = null, size: Int? = null): List<ReportNode> {
         val projectsByIdMap = projectRepository.getProjects(serverName, page, size)
                 .map { project -> project.key.id to project }.toMap()
         val buildTypesByIdMap = buildTypeRepository.getBuildTypesByProjectIdsAndServerNames(projectsByIdMap.keys.toList(), serverName, page, size)
                 .map { buildType -> (buildType.key.buildTypeId) to buildType }.toMap()
 
-        val result = hashMapOf<String, ReportTableNode>()
+        val result = hashMapOf<String, ReportNode>()
 
         projectsByIdMap.values.forEach { project ->
             result[project.key.id] = project.toTableNode()
@@ -49,15 +47,26 @@ class ReportTableModelLoader : Serializable {
         result.values.forEach { item ->
             result[item.parentId]?.childrens?.add(item)
         }
-        return listOf(ReportTableNode("_RootTotal", "Total",
+        return listOf(ReportNode("_RootTotal", "Total",
                 childrens = result.values.filter { it.parentId == ROOT_PARENT_PROJECT_ID }.toMutableList()).apply {
             duration = calculateDuration()
             durationPercentage = calculatePercentageDuration(duration)
         })
     }
 
-    private fun BuildTypeViewEntity.toTableNode() = ReportTableNode(key.buildTypeId, buildTypeName)
+    fun loadReportModelFlat(serverName: String, beforeFinishDate: Long, afterFinishDate: Long, page: Int? = null, size: Int? = null)
+            = loadReportModel(serverName, beforeFinishDate, afterFinishDate, page, size)[0].childrens.flatCollectAllNodes()
 
-    private fun ProjectEntity.toTableNode() = ReportTableNode(key.id, name, parentId = parentProjectId)
+    private fun List<ReportNode>.flatCollectAllNodes(nodeList: MutableList<ReportNode> = mutableListOf()): List<ReportNode> {
+        forEach { node ->
+            nodeList.add(node)
+            node.childrens.flatCollectAllNodes(nodeList)
+        }
+        return nodeList
+    }
+
+    private fun BuildTypeViewEntity.toTableNode() = ReportNode(key.buildTypeId, buildTypeName)
+
+    private fun ProjectEntity.toTableNode() = ReportNode(key.id, name, parentId = parentProjectId)
 
 }

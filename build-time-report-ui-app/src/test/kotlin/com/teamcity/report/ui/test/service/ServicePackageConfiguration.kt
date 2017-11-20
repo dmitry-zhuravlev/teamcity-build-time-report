@@ -1,7 +1,8 @@
 package com.teamcity.report.ui.test.service
 
 import com.teamcity.report.repository.*
-import com.teamcity.report.ui.service.ReportTableModelLoader
+import com.teamcity.report.ui.service.ReportModelLoader
+import com.teamcity.report.ui.service.ServerNamesLoader
 import org.mockito.Mockito.mock
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,7 +15,13 @@ import org.springframework.context.annotation.Configuration
 class ServicePackageConfiguration {
 
     @Bean
-    fun reportTableModelLoader() = ReportTableModelLoader()
+    fun reportModelLoader() = ReportModelLoader()
+
+    @Bean
+    fun serverNamesLoader() = ServerNamesLoader()
+
+    @Bean
+    fun serverReporsitory() = mock(ServerRepository::class.java)
 
     @Bean
     fun buildRepository(): BuildRepository = mock(BuildRepository::class.java)
