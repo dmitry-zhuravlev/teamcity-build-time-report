@@ -4,6 +4,7 @@ import com.vaadin.ui.Button
 import com.vaadin.ui.DateTimeField
 import com.vaadin.ui.UI
 import com.vaadin.ui.themes.ValoTheme
+import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 
 /**
@@ -36,3 +37,7 @@ fun durationRepresentation(durationMillis: Long): String {
         if (isBlank()) append(durationMillis).append(" ms ")
     }.toString()
 }
+
+fun rgbaRandomColors(length: Int, alpha: Float = 0.5F) = Array(length) { "rgba(${(0..255).random()},${(0..255).random()},${(0..255).random()},$alpha)" }
+fun IntRange.random() = random.nextInt(start, endInclusive + 1)
+private val random = ThreadLocalRandom.current()

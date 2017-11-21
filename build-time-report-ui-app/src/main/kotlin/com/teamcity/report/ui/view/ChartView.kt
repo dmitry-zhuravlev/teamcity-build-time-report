@@ -7,6 +7,7 @@ import com.byteowls.vaadin.chartjs.options.Position
 import com.teamcity.report.ui.service.ReportModelLoader
 import com.teamcity.report.ui.service.ServerNamesLoader
 import com.teamcity.report.ui.util.isValid
+import com.teamcity.report.ui.util.rgbaRandomColors
 import com.vaadin.event.ShortcutAction
 import com.vaadin.navigator.View
 import com.vaadin.spring.annotation.SpringView
@@ -14,13 +15,9 @@ import com.vaadin.spring.annotation.UIScope
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import org.springframework.beans.factory.annotation.Autowired
-import java.awt.Color
 import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.annotation.PostConstruct
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.staticProperties
-import kotlin.reflect.jvm.jvmErasure
 
 
 /**
@@ -32,13 +29,6 @@ import kotlin.reflect.jvm.jvmErasure
 class ChartView : VerticalLayout(), View {
     companion object {
         const val VIEW_NAME = "chart"
-
-        val colors = Color::class.staticProperties
-                .filter { it.returnType.jvmErasure.isSubclassOf(Color::class) }
-                .map { it.get() as Color }
-                .map { "rgba(${it.red},${it.green},${it.blue},0.5)" }
-                .toSet()
-                .toTypedArray()
     }
 
     @Autowired
@@ -51,6 +41,8 @@ class ChartView : VerticalLayout(), View {
     lateinit var fromDateTimeField: DateTimeField
     lateinit var toDateTimeField: DateTimeField
     lateinit var serverNamesComboBox: ComboBox<String>
+
+    var colors = rgbaRandomColors(100)
 
     @PostConstruct
     fun init() {
@@ -145,6 +137,9 @@ class ChartView : VerticalLayout(), View {
             return pieChartConfig
         }
         val nodes = reportModelLoader.loadReportModelFlat(serverName, beforeFinishDate, afterFinishDate)
+        if (colors.size < nodes.size) {
+            colors = rgbaRandomColors(nodes.size)
+        }
         chartData.labelsAsList(nodes.map { it.name })
 
         val serverDataset = PieDataset().label(serverName).backgroundColor(*colors)
@@ -160,11 +155,10 @@ class ChartView : VerticalLayout(), View {
                 .title()
                 .display(true)
                 .position(Position.TOP)
-                .text("TeamCity Projects/Project configurations build time (%)")
+                .text("TeamCity Project/Project Configuration build time (%)")
                 .and()
                 .done()
         return pieChartConfig
     }
-
 
 }
